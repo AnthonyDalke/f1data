@@ -1,43 +1,46 @@
 import fastf1 as ff1
 import os
 import pandas as pd
+import time
+from typing import List
 
 
-# def get_years(start, end):
-#     """
-#     Get the list of years for which data exists.
+def get_years(start: int, end: int) -> List[int]:
+    """
+    Get the list of years for which data exists.
 
-#     Parameters:
-#     start (int): The first year for which to retrieve data.
-#     end (int): The last year for which to retrieve data.
+    Parameters:
+    start (int): The first year for which to retrieve data.
+    end (int): The last year for which to retrieve data.
 
-#     Returns:
-#     list: A list of years.
-#     """
+    Returns:
+    List: A list of years.
+    """
 
-#     years = list(range(start, end + 1))
+    years = list(range(start, end + 1))
 
-#     return years
-
-
-# def get_rounds(year):
-#     """
-#     Get the list of round numbers for a given year.
-
-#     Parameters:
-#     year (int): The year for which to retrieve round numbers.
-
-#     Returns:
-#     list: A list of round numbers.
-#     """
-
-#     schedule = ff1.get_event_schedule(1994)
-#     rounds = schedule.RoundNumber.to_list()
-
-#     return rounds
+    return years
 
 
-def get_df_raw_quali(year: int, round: int) -> pd.DataFrame:
+def get_rounds(year: int) -> List[int]:
+    """
+    Get the list of round numbers for a given year.
+
+    Parameters:
+    year (int): The year for which to retrieve round numbers.
+
+    Returns:
+    list: A list of round numbers.
+    """
+
+    schedule = ff1.get_event_schedule(year)
+    rounds_all = schedule.RoundNumber.to_list()
+    rounds_official = [r for r in rounds_all if r > 0]
+
+    return rounds_official
+
+
+def get_df_quali_raw(year: int, round: int) -> pd.DataFrame:
     """
     Retrieve qualifying session data for a given year and round.
 
@@ -59,7 +62,7 @@ def get_df_raw_quali(year: int, round: int) -> pd.DataFrame:
     return df
 
 
-def get_df_processed_quali(df_raw: pd.DataFrame) -> pd.DataFrame:
+def get_df_quali_processed(df_raw: pd.DataFrame) -> pd.DataFrame:
     """
     Process the raw qualifying data and return a processed DataFrame.
 
@@ -105,7 +108,7 @@ def get_df_processed_quali(df_raw: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_df_final_quali(df_processed: pd.DataFrame) -> pd.DataFrame:
+def get_df_quali_final(df_processed: pd.DataFrame) -> pd.DataFrame:
     """
     Extracts the required columns from the processed DataFrame and returns a new DataFrame.
 
@@ -139,7 +142,7 @@ def get_df_final_quali(df_processed: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_df_raw_race(year: int, round: int) -> pd.DataFrame:
+def get_df_race_raw(year: int, round: int) -> pd.DataFrame:
     """
     Retrieve race session data for a given year and round.
 
@@ -151,7 +154,7 @@ def get_df_raw_race(year: int, round: int) -> pd.DataFrame:
     pd.DataFrame: A DataFrame containing the race session data.
     """
 
-    session = ff1.get_session(1950, 1, "R")
+    session = ff1.get_session(year, round, "R")
     session.load()
 
     df = session.results[
@@ -168,7 +171,7 @@ def get_df_raw_race(year: int, round: int) -> pd.DataFrame:
     return df
 
 
-def get_df_processed_race(df_raw: pd.DataFrame) -> pd.DataFrame:
+def get_df_race_processed(df_raw: pd.DataFrame) -> pd.DataFrame:
     """
     Process the raw race data and return a processed DataFrame.
 
@@ -199,7 +202,7 @@ def get_df_processed_race(df_raw: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_df_final_race(df_processed: pd.DataFrame) -> pd.DataFrame:
+def get_df_race_final(df_processed: pd.DataFrame) -> pd.DataFrame:
     """
     Returns a DataFrame containing the final race data.
 
@@ -225,14 +228,115 @@ def get_df_final_race(df_processed: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def get_df_event_raw(year: int, round: int) -> pd.DataFrame:
+    """
+    Retrieve event session data for a given year and round.
+
+    Parameters:
+    year (int): The year of the session.
+    round (int): The round number of the session.
+
+    Returns:
+    pd.DataFrame: A DataFrame containing the event session data.
+    """
+
+    session = ff1.get_session(year, round, "R")
+    session.load()
+
+    df = session.event[["RoundNumber", "Location", "EventDate", "Country"]].to_frame()
+
+    return df
+
+
+def get_df_event_processed(df_raw: pd.DataFrame) -> pd.DataFrame:
+    """
+    Process the raw event data and return a processed DataFrame.
+
+    Parameters:
+    - df_raw (pd.DataFrame): The raw event data DataFrame.
+
+    Returns:
+    - pd.DataFrame: The processed event data DataFrame.
+    """
+
+    df = df_raw.T.reset_index(drop=True)
+
+    df.columns = df.columns.str.lower()
+    df.rename(
+        columns={
+            "roundnumber": "round",
+            "location": "circuit_name",
+            "country": "circuit_country",
+        },
+        inplace=True,
+    )
+    df["year"] = df["eventdate"].dt.year
+
+    return df
+
+
+def get_df_event_final(df_processed: pd.DataFrame) -> pd.DataFrame:
+    """
+    Returns a DataFrame containing the final event data.
+
+    Args:
+        df_processed (pd.DataFrame): The processed DataFrame containing event data.
+
+    Returns:
+        pd.DataFrame: The DataFrame containing the final event data.
+    """
+
+    df = df_processed[["year", "round", "circuit_name", "circuit_country"]]
+
+    return df
+
+
 def main():
-    year_start = os.environ["year_start"]
-    year_end = os.environ["year_end"]
+    year_start = int(os.environ["year_start"])
+    year_end = int(os.environ["year_end"])
+
+    df_quali_all = []
+    df_race_all = []
+    df_event_all = []
 
     list_years = get_years(year_start, year_end)
 
     for year in list_years:
+        print(f"year: {year}")
         list_rounds = get_rounds(year)
+
+        for round in list_rounds:
+            df_quali_raw = get_df_quali_raw(year, round)
+            df_quali_processed = get_df_quali_processed(df_quali_raw)
+            df_quali_final = get_df_quali_final(df_quali_processed)
+
+            df_quali_all.append(df_quali_final)
+
+            time.sleep(3)
+
+            df_race_raw = get_df_race_raw(year, round)
+            df_race_processed = get_df_race_processed(df_race_raw)
+            df_race_final = get_df_race_final(df_race_processed)
+
+            df_race_all.append(df_race_final)
+
+            time.sleep(3)
+
+            df_event_raw = get_df_event_raw(year, round)
+            df_event_processed = get_df_event_processed(df_event_raw)
+            df_event_final = get_df_event_final(df_event_processed)
+
+            df_event_all.append(df_event_final)
+
+            time.sleep(3)
+
+    df_quali_all = pd.concat(df_quali_all, ignore_index=True)
+    df_race_all = pd.concat(df_race_all, ignore_index=True)
+    df_event_all = pd.concat(df_event_all, ignore_index=True)
+
+    print(f"df_quali_all: {df_quali_all}")
+    print(f"df_race_all: {df_race_all}")
+    print(f"df_event_all: {df_event_all}")
 
 
 if __name__ == "__main__":
