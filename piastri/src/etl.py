@@ -303,6 +303,136 @@ def get_df_event_final(df_processed: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def get_df_sessions(df_quali: pd.DataFrame, df_race: pd.DataFrame) -> pd.DataFrame:
+    """
+    Concatenates the given qualifying and race DataFrames into a single DataFrame.
+
+    Args:
+        df_quali (pd.DataFrame): The DataFrame containing qualifying data.
+        df_race (pd.DataFrame): The DataFrame containing race data.
+
+    Returns:
+        pd.DataFrame: The concatenated DataFrame containing both qualifying and race data.
+    """
+
+    df = pd.concat([df_quali, df_race], ignore_index=True)
+
+    return df
+
+
+def get_df_denormalized(
+    df_sessions: pd.DataFrame, df_event: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Merge the sessions DataFrame with the event DataFrame based on the year and round columns.
+
+    Args:
+        df_sessions (pd.DataFrame): The sessions DataFrame.
+        df_event (pd.DataFrame): The event DataFrame.
+
+    Returns:
+        pd.DataFrame: DataFrame containing denormalized data for sessions and event.
+    """
+
+    df_denormalized = df_event.merge(df_sessions, on=["year", "round"], how="outer")
+
+    return df_denormalized
+
+
+def get_df_events(df_event: pd.DataFrame) -> pd.DataFrame:
+    """
+    Get a DataFrame isolating normalized event data.
+
+    Args:
+        df_event (pd.DataFrame): The input DataFrame containing event data.
+
+    Returns:
+        pd.DataFrame: Normalized DataFrame with columns 'year', 'round', and 'circuit_name'.
+    """
+
+    df = df_event[["year", "round", "circuit_name"]].reset_index(drop=True)
+
+    return df
+
+
+def get_df_drivers(df_sessions: pd.DataFrame) -> pd.DataFrame:
+    """
+    Get a DataFrame isolating normalized driver data.
+
+    Args:
+        df_event (pd.DataFrame): The input DataFrame containing driver data.
+
+    Returns:
+        pd.DataFrame: Normalized DataFrame with columns
+            'id_driver', 'name_driver_last', and 'name_driver_first'.
+    """
+
+    df = (
+        df_sessions[["id_driver", "name_driver_last", "name_driver_first"]]
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
+
+    return df
+
+
+def get_df_teams(df_sessions: pd.DataFrame) -> pd.DataFrame:
+    """
+    Get a DataFrame isolating normalized team data.
+
+    Args:
+        df_event (pd.DataFrame): The input DataFrame containing team data.
+
+    Returns:
+        pd.DataFrame: Normalized DataFrame with columns
+            'name_team', 'year', and 'id_driver'.
+    """
+
+    df = (
+        df_sessions[["name_team", "year", "id_driver"]]
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
+
+    return df
+
+
+def get_df_circuits(df_event: pd.DataFrame) -> pd.DataFrame:
+    """
+    Get a DataFrame isolating normalized circuit data.
+
+    Args:
+        df_event (pd.DataFrame): The input DataFrame containing circuit data.
+
+    Returns:
+        pd.DataFrame: Normalized DataFrame with columns
+            'circuit_name' and 'circuit_country'.
+    """
+
+    df = df_event[["circuit_name", "circuit_country"]].reset_index(drop=True)
+
+    return df
+
+
+def get_df_results(df_sessions: pd.DataFrame) -> pd.DataFrame:
+    """
+    Get a DataFrame isolating normalized result data.
+
+    Args:
+        df_event (pd.DataFrame): The input DataFrame containing result data.
+
+    Returns:
+        pd.DataFrame: Normalized DataFrame with columns
+            'year', 'round', 'id_driver', 'name_team', 'session', 'position' and 'time'.
+    """
+
+    df = df_sessions[
+        ["year", "round", "id_driver", "name_team", "session", "position", "time"]
+    ].reset_index(drop=True)
+
+    return df
+
+
 def main():
     year_start = int(os.environ["year_start"])
     year_end = int(os.environ["year_end"])
@@ -346,9 +476,9 @@ def main():
     df_race_all = pd.concat(df_race_all, ignore_index=True)
     df_event_all = pd.concat(df_event_all, ignore_index=True)
 
-    print(f"df_quali_all: {df_quali_all}")
-    print(f"df_race_all: {df_race_all}")
-    print(f"df_event_all: {df_event_all}")
+    df_sessions = get_df_sessions(df_quali_all, df_race_all)
+
+    df_denormalized = get_df_denormalized(df_sessions, df_event_all)
 
 
 if __name__ == "__main__":
