@@ -1,0 +1,5 @@
+fastf1 >= 3.1.6
+os
+pandas >= 2.1.4
+time
+typing
