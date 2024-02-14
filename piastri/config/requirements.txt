@@ -1,5 +1,7 @@
 fastf1 >= 3.1.6
-os
+os >= 2.1.4
 pandas >= 2.1.4
-time
+psycopg2 >= 2.9.1
+sqlalchemy >= 1.4.25
+time >= 2.1.4
 typing
