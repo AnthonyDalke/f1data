@@ -1,23 +1,17 @@
 # Use an official Python runtime as a parent image
-FROM python:3.8-slim-buster
+FROM python:3.9.18-slim-bookworm
 
 # Set the working directory in the container to /app
 WORKDIR /app
 
 # Add the src directory contents into the container at /app
-ADD src /app
-
-# Copy requirements.txt file into the container
-COPY requirements.txt .
+ADD . /app
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application's code into the container
-COPY . .
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
 # Run etl.py when the container launches
-CMD ["python", "etl.py"]
+CMD ["python", "src/etl.py"]

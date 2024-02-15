@@ -1,6 +1,6 @@
 import fastf1 as ff1
 import pandas as pd
-import psycopg2
+import pg8000
 import os
 from typing import List
 
@@ -453,7 +453,7 @@ def get_env_var(filename: str) -> None:
 
 
 def run_sql_script(
-    name: str, user: str, password: str, host: str, port: str, scripts: list
+    name: str, user: str, password: str, host: str, port: str, dir: str, scripts: list
 ) -> None:
     """
     Executes SQL scripts on a PostgreSQL database.
@@ -464,19 +464,21 @@ def run_sql_script(
         password (str): The password for the database connection.
         host (str): The host address of the database.
         port (str): The port number of the database.
+        dir (str): The directory containing the SQL scripts.
         scripts (list): A list of file paths to the SQL scripts to be executed.
 
     Returns:
         None.
     """
 
-    conn = psycopg2.connect(
+    conn = pg8000.connect(
         dbname=name, user=user, password=password, host=host, port=port
     )
     cursor = conn.cursor()
 
     for script in scripts:
-        with open(script, "r") as file:
+        file_path = os.path.join(dir, script)
+        with open(file_path, "r") as file:
             cursor.execute(file.read())
         conn.commit()
 
