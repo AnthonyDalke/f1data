@@ -4,7 +4,10 @@ FROM python:3.9.18-slim-bookworm
 # Set the working directory in the container to /app
 WORKDIR /app
 
-# Add the src directory contents into the container at /app
+# Set the Python path to include /app
+ENV PYTHONPATH /app:$PYTHONPATH
+
+# Add the current directory contents into the container at /app
 ADD . /app
 
 # Install any needed packages specified in requirements.txt
@@ -14,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 80
 
 # Run etl.py when the container launches
-CMD ["python", "src/etl.py"]
+CMD ["python", "-m", "src.etl"]

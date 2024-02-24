@@ -1,8 +1,10 @@
 import fastf1 as ff1
 import pandas as pd
-import pg8000
 import os
-from typing import List
+
+from sqlalchemy import create_engine
+from sqlalchemy.dialects.postgresql import insert
+from typing import Dict, List
 
 
 def get_years(start: int, end: int) -> List[int]:
@@ -452,35 +454,39 @@ def get_env_var(filename: str) -> None:
                 os.environ[key] = value
 
 
-def run_sql_script(
-    name: str, user: str, password: str, host: str, port: str, dir: str, scripts: list
+def write_df_postgres(
+    user: str,
+    password: str,
+    database: str,
+    host: str,
+    port: str,
+    df: pd.DataFrame,
+    table: str,
+    keys: List[str],
 ) -> None:
     """
-    Executes SQL scripts on a PostgreSQL database.
+    Write a DataFrame to a PostgreSQL table.
 
     Args:
-        name (str): The name of the database.
         user (str): The username for the database connection.
         password (str): The password for the database connection.
+        database (str): The name of the database.
         host (str): The host address of the database.
         port (str): The port number of the database.
-        dir (str): The directory containing the SQL scripts.
-        scripts (list): A list of file paths to the SQL scripts to be executed.
+        df (pd.DataFrame): The DataFrame to be written to the database.
+        table (str): The target table for the DataFrame.
+        keys (List[str]): A list of primary key columns for the target table.
 
     Returns:
         None.
     """
 
-    conn = pg8000.connect(
-        dbname=name, user=user, password=password, host=host, port=port
-    )
-    cursor = conn.cursor()
+    engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/{database}")
 
-    for script in scripts:
-        file_path = os.path.join(dir, script)
-        with open(file_path, "r") as file:
-            cursor.execute(file.read())
-        conn.commit()
+    data = df.to_dict("records")
 
-    cursor.close()
-    conn.close()
+    stmt = insert(f"sessions.{table}").values(data)
+    stmt = stmt.on_conflict_do_nothing(index_elements={keys})
+
+    with engine.begin() as connection:
+        connection.execute(stmt)

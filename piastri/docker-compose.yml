@@ -13,10 +13,12 @@ services:
 
   app:
     build: .
-    command: python src/etl.py
+    command: python -m src.etl
     volumes:
       - .:/app
     ports:
       - 8000:80
     depends_on:
       - db
+    env_file:
+      - .env
