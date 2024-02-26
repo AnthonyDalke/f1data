@@ -25,8 +25,6 @@ from functions.functions import (
     write_df_postgres,
 )
 
-DB_NAME = os.environ["DB_NAME"]
-
 
 def main():
     get_env_var(".env")
