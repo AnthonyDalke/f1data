@@ -42,22 +42,37 @@ def get_rounds(year: int) -> List[int]:
     return rounds_official
 
 
-def get_df_quali_raw(year: int, round: int) -> pd.DataFrame:
+def get_data_session(year: str, round: str, session: str) -> None:
     """
-    Retrieve qualifying session data for a given year and round.
+    Retrieve session data for a given year, round, and session.
 
     Args:
-        year (int): The year of the session.
-        round (int): The round number of the session.
+        year (str): The year of the session.
+        round (str): The round number of the session.
+        session (str): The session type (P, Q, R).
 
     Returns:
-        pd.DataFrame: A DataFrame containing the qualifying session data.
+        None.
     """
 
-    session = ff1.get_session(year, round, "Q")
+    session = ff1.get_session(year, round, session)
     session.load()
 
-    df = session.results[
+    return session
+
+
+def get_df_quali_raw(data_session: None) -> pd.DataFrame:
+    """
+    Retrieve qualifying session data from a DataFrame.
+
+    Args:
+        data_session (None): The raw qualifying session data.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the relevant columns from the qualifying data.
+    """
+
+    df = data_session.results[
         ["Q1", "Q2", "Q3", "DriverId", "LastName", "FirstName", "TeamName", "Position"]
     ]
 
@@ -150,22 +165,18 @@ def get_df_quali_final(df_processed: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_df_race_raw(year: int, round: int) -> pd.DataFrame:
+def get_df_race_raw(data_session: None) -> pd.DataFrame:
     """
-    Retrieve race session data for a given year and round.
+    Retrieve race session data from a DataFrame.
 
     Args:
-        year (int): The year of the session.
-        round (int): The round number of the session.
+        data_session (None): The raw race session data.
 
     Returns:
-        pd.DataFrame: A DataFrame containing the race session data.
+        pd.DataFrame: A DataFrame containing the relevant columns from the race data.
     """
 
-    session = ff1.get_session(year, round, "R")
-    session.load()
-
-    df = session.results[
+    df = data_session.results[
         [
             "DriverId",
             "LastName",
@@ -242,22 +253,20 @@ def get_df_race_final(df_processed: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_df_event_raw(year: int, round: int) -> pd.DataFrame:
+def get_df_event_raw(data_session: None) -> pd.DataFrame:
     """
     Retrieve event session data for a given year and round.
 
     Args:
-        year (int): The year of the session.
-        round (int): The round number of the session.
+        data_session (None): Raw session data.
 
     Returns:
-        pd.DataFrame: A DataFrame containing the event session data.
+        pd.DataFrame: A DataFrame with the relevant columns from the event data.
     """
 
-    session = ff1.get_session(year, round, "R")
-    session.load()
-
-    df = session.event[["RoundNumber", "Location", "EventDate", "Country"]].to_frame()
+    df = data_session.event[
+        ["RoundNumber", "Location", "EventDate", "Country"]
+    ].to_frame()
 
     return df
 
@@ -284,6 +293,8 @@ def get_df_event_processed(df_raw: pd.DataFrame) -> pd.DataFrame:
         },
         inplace=True,
     )
+
+    df["eventdate"] = pd.to_datetime(df["eventdate"])
     df["year"] = df["eventdate"].dt.year
     df["round"] = df["round"].astype(int)
 

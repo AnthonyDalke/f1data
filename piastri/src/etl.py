@@ -5,6 +5,7 @@ import time
 from functions.functions import (
     get_years,
     get_rounds,
+    get_data_session,
     get_df_quali_raw,
     get_df_quali_processed,
     get_df_quali_final,
@@ -49,7 +50,10 @@ def main():
         list_rounds = get_rounds(year)
 
         for round in list_rounds:
-            df_quali_raw = get_df_quali_raw(year, round)
+            data_session_quali = get_data_session(year, round, "Q")
+            data_session_race = get_data_session(year, round, "R")
+
+            df_quali_raw = get_df_quali_raw(data_session_quali)
             df_quali_processed = get_df_quali_processed(df_quali_raw, year, round)
             df_quali_final = get_df_quali_final(df_quali_processed)
 
@@ -57,7 +61,7 @@ def main():
 
             time.sleep(3)
 
-            df_race_raw = get_df_race_raw(year, round)
+            df_race_raw = get_df_race_raw(data_session_race)
             df_race_processed = get_df_race_processed(df_race_raw, year, round)
             df_race_final = get_df_race_final(df_race_processed)
 
@@ -65,7 +69,7 @@ def main():
 
             time.sleep(3)
 
-            df_event_raw = get_df_event_raw(year, round)
+            df_event_raw = get_df_event_raw(data_session_race)
             df_event_processed = get_df_event_processed(df_event_raw)
             df_event_final = get_df_event_final(df_event_processed)
 
