@@ -100,7 +100,7 @@ def main():
 
     dict_db = {
         "df_denormalized": {
-            "table": "denormalized",
+            "table": "events_denormalized",
             "primary_keys": ["year", "round", "id_driver", "session"],
         },
         "df_events": {"table": "events", "primary_keys": ["year", "round"]},

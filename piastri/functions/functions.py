@@ -2,7 +2,7 @@ import fastf1 as ff1
 import pandas as pd
 import os
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.dialects.postgresql import insert
 from typing import Dict, List
 
@@ -494,9 +494,12 @@ def write_df_postgres(
 
     engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/{database}")
 
+    metadata = MetaData()
+    obj_table = Table(table, metadata, autoload_with=engine, schema="sessions")
+
     data = df.to_dict("records")
 
-    stmt = insert(f"sessions.{table}").values(data)
+    stmt = insert(obj_table).values(data)
     stmt = stmt.on_conflict_do_nothing(index_elements={keys})
 
     with engine.begin() as connection:

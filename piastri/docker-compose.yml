@@ -22,6 +22,3 @@ services:
       - db
     env_file:
       - .env
-    environment:
-      year_start: "2023"
-      year_end: "2023"
