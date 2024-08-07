@@ -30,12 +30,13 @@ CREATE TABLE IF NOT EXISTS sessions.drivers (
 CREATE TABLE IF NOT EXISTS sessions.teams (
     name_team TEXT PRIMARY KEY,
     year SMALLINT NOT NULL,
-    id_driver TEXT NOT NULL
+    id_driver TEXT NOT NULL,
+    PRIMARY KEY (name_team, year)
 );
 
 CREATE TABLE IF NOT EXISTS sessions.circuits (
-    circuit_name TEXT PRIMARY KEY,
-    circuit_country TEXT NOT NULL
+    name_circuit TEXT PRIMARY KEY,
+    country_circuit TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS sessions.results (
@@ -45,7 +46,8 @@ CREATE TABLE IF NOT EXISTS sessions.results (
     name_team TEXT NOT NULL,
     session TEXT NOT NULL,
     position TEXT NOT NULL,
-    time INTERVAL NULL
+    time INTERVAL NULL,
+    PRIMARY KEY (year, round, id_driver)
 );
 
 CREATE INDEX IF NOT EXISTS idx_ed_y
