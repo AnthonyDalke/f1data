@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS sessions.events_denormalized (
 CREATE TABLE IF NOT EXISTS sessions.events (
     year SMALLINT NOT NULL,
     round SMALLINT NOT NULL,
-    circuit_name TEXT NOT NULL,
+    name_circuit TEXT NOT NULL,
     PRIMARY KEY (year, round)
 );
 
@@ -77,5 +77,17 @@ CREATE INDEX IF NOT EXISTS idx_d_i
 CREATE INDEX IF NOT EXISTS idx_t_n
     ON sessions.teams (name_team);
 
+CREATE INDEX IF NOT EXISTS idx_t_y
+    ON sessions.teams (year);
+
 CREATE INDEX IF NOT EXISTS idx_c_n
-    ON sessions.circuits (circuit_name);
+    ON sessions.circuits (name_circuit);
+
+CREATE INDEX IF NOT EXISTS idx_r_y
+    ON sessions.results (year);
+
+CREATE INDEX IF NOT EXISTS idx_r_r
+    ON sessions.results (round);
+
+CREATE INDEX IF NOT EXISTS idx_r_i
+    ON sessions.results (id_driver);
