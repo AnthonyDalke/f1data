@@ -3,8 +3,8 @@ CREATE SCHEMA sessions;
 CREATE TABLE IF NOT EXISTS sessions.events_denormalized (
     year SMALLINT NOT NULL,
     round SMALLINT NOT NULL,
-    circuit_name TEXT NOT NULL,
-    circuit_country TEXT NOT NULL,
+    name_circuit TEXT NOT NULL,
+    country_circuit TEXT NOT NULL,
     id_driver TEXT NOT NULL,
     name_driver_last TEXT NOT NULL,
     name_driver_first TEXT NOT NULL,
