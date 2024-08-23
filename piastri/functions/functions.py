@@ -61,260 +61,260 @@ def get_data_session(year: str, round: str, session: str) -> None:
     return session
 
 
-def get_df_quali_raw(data_session: None) -> pd.DataFrame:
-    """
-    Retrieve qualifying session data from a DataFrame.
+# def get_df_quali_raw(data_session: None) -> pd.DataFrame:
+#     """
+#     Retrieve qualifying session data from a DataFrame.
 
-    Args:
-        data_session (None): The raw qualifying session data.
+#     Args:
+#         data_session (None): The raw qualifying session data.
 
-    Returns:
-        pd.DataFrame: A DataFrame containing the relevant columns from the qualifying data.
-    """
+#     Returns:
+#         pd.DataFrame: A DataFrame containing the relevant columns from the qualifying data.
+#     """
 
-    df = data_session.results[
-        ["Q1", "Q2", "Q3", "DriverId", "LastName", "FirstName", "TeamName", "Position"]
-    ]
+#     df = data_session.results[
+#         ["Q1", "Q2", "Q3", "DriverId", "LastName", "FirstName", "TeamName", "Position"]
+#     ]
 
-    return df
-
-
-def get_df_quali_processed(df_raw: pd.DataFrame, year: int, round: int) -> pd.DataFrame:
-    """
-    Process the raw qualifying data and return a processed DataFrame.
-
-    Args:
-        df_raw (pd.DataFrame): The raw DataFrame containing qualifying data.
-        year (int): The year of the session.
-        round (int): The round number of the session.
-
-    Returns:
-        pd.DataFrame: The processed DataFrame with the following columns:
-            - id_driver: The driver ID.
-            - name_driver_last: The last name of the driver.
-            - name_driver_first: The first name of the driver.
-            - name_team: The name of the team.
-            - session: The qualifying session (Q1, Q2, or Q3).
-            - time: The qualifying time.
-            - position: The qualifying position of the driver in the session.
-    """
-
-    df = df_raw.melt(
-        id_vars=["DriverId", "LastName", "FirstName", "TeamName", "Position"],
-        value_vars=["Q1", "Q2", "Q3"],
-        var_name="session",
-        value_name="time",
-    )
-
-    df.columns = df.columns.str.lower()
-
-    df["year"] = year
-    df["round"] = round
-    df["originalposition"] = df["position"]
-    df["position"] = df.groupby("session")["time"].rank(method="min", ascending=True)
-    df["position"] = df["position"].fillna(df["originalposition"])
-
-    df = df.drop(columns=["originalposition"])
-
-    df.rename(
-        columns={
-            "driverid": "id_driver",
-            "lastname": "name_driver_last",
-            "firstname": "name_driver_first",
-            "teamname": "name_team",
-        },
-        inplace=True,
-    )
-
-    return df
+#     return df
 
 
-def get_df_quali_final(df_processed: pd.DataFrame) -> pd.DataFrame:
-    """
-    Extracts the required columns from the processed DataFrame and returns a new DataFrame.
+# def get_df_quali_processed(df_raw: pd.DataFrame, year: int, round: int) -> pd.DataFrame:
+#     """
+#     Process the raw qualifying data and return a processed DataFrame.
 
-    Args:
-        df_processed (pd.DataFrame): The processed DataFrame containing the F1 data.
+#     Args:
+#         df_raw (pd.DataFrame): The raw DataFrame containing qualifying data.
+#         year (int): The year of the session.
+#         round (int): The round number of the session.
 
-    Returns:
-        pd.DataFrame: A new DataFrame with the following columns:
-            - id_driver: The ID of the driver.
-            - name_driver_last: The last name of the driver.
-            - name_driver_first: The first name of the driver.
-            - name_team: The name of the team.
-            - session: The session of the race.
-            - position: The position of the driver in the race.
-            - time: The time taken by the driver in the race.
+#     Returns:
+#         pd.DataFrame: The processed DataFrame with the following columns:
+#             - id_driver: The driver ID.
+#             - name_driver_last: The last name of the driver.
+#             - name_driver_first: The first name of the driver.
+#             - name_team: The name of the team.
+#             - session: The qualifying session (Q1, Q2, or Q3).
+#             - time: The qualifying time.
+#             - position: The qualifying position of the driver in the session.
+#     """
 
-    """
+#     df = df_raw.melt(
+#         id_vars=["DriverId", "LastName", "FirstName", "TeamName", "Position"],
+#         value_vars=["Q1", "Q2", "Q3"],
+#         var_name="session",
+#         value_name="time",
+#     )
 
-    df = df_processed[
-        [
-            "year",
-            "round",
-            "id_driver",
-            "name_driver_last",
-            "name_driver_first",
-            "name_team",
-            "session",
-            "position",
-            "time",
-        ]
-    ]
+#     df.columns = df.columns.str.lower()
 
-    return df
+#     df["year"] = year
+#     df["round"] = round
+#     df["originalposition"] = df["position"]
+#     df["position"] = df.groupby("session")["time"].rank(method="min", ascending=True)
+#     df["position"] = df["position"].fillna(df["originalposition"])
 
+#     df = df.drop(columns=["originalposition"])
 
-def get_df_race_raw(data_session: None) -> pd.DataFrame:
-    """
-    Retrieve race session data from a DataFrame.
+#     df.rename(
+#         columns={
+#             "driverid": "id_driver",
+#             "lastname": "name_driver_last",
+#             "firstname": "name_driver_first",
+#             "teamname": "name_team",
+#         },
+#         inplace=True,
+#     )
 
-    Args:
-        data_session (None): The raw race session data.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing the relevant columns from the race data.
-    """
-
-    df = data_session.results[
-        [
-            "DriverId",
-            "LastName",
-            "FirstName",
-            "TeamName",
-            "ClassifiedPosition",
-            "Time",
-        ]
-    ]
-
-    return df
+#     return df
 
 
-def get_df_race_processed(df_raw: pd.DataFrame, year: int, round: int) -> pd.DataFrame:
-    """
-    Process the raw race data and return a processed DataFrame.
+# def get_df_quali_final(df_processed: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Extracts the required columns from the processed DataFrame and returns a new DataFrame.
 
-    Args:
-        df_raw (pd.DataFrame): The raw race data DataFrame.
-        year (int): The year of the session.
-        round (int): The round number of the session.
+#     Args:
+#         df_processed (pd.DataFrame): The processed DataFrame containing the F1 data.
 
-    Returns:
-        pd.DataFrame: The processed race data DataFrame.
-    """
+#     Returns:
+#         pd.DataFrame: A new DataFrame with the following columns:
+#             - id_driver: The ID of the driver.
+#             - name_driver_last: The last name of the driver.
+#             - name_driver_first: The first name of the driver.
+#             - name_team: The name of the team.
+#             - session: The session of the race.
+#             - position: The position of the driver in the race.
+#             - time: The time taken by the driver in the race.
 
-    df = df_raw.copy().reset_index(drop=True)
+#     """
 
-    df["year"] = year
-    df["round"] = round
-    df["session"] = "Race"
+#     df = df_processed[
+#         [
+#             "year",
+#             "round",
+#             "id_driver",
+#             "name_driver_last",
+#             "name_driver_first",
+#             "name_team",
+#             "session",
+#             "position",
+#             "time",
+#         ]
+#     ]
 
-    df.columns = df.columns.str.lower()
-    df.rename(
-        columns={
-            "classifiedposition": "position",
-            "driverid": "id_driver",
-            "lastname": "name_driver_last",
-            "firstname": "name_driver_first",
-            "teamname": "name_team",
-        },
-        inplace=True,
-    )
-    df.loc[1:, "time"] = df.loc[1:, "time"] + df.loc[0, "time"]
-
-    return df
-
-
-def get_df_race_final(df_processed: pd.DataFrame) -> pd.DataFrame:
-    """
-    Returns a DataFrame containing the final race data.
-
-    Args:
-        df_processed (pd.DataFrame): The processed DataFrame containing race data.
-
-    Returns:
-        pd.DataFrame: The DataFrame containing the final race data.
-    """
-
-    df = df_processed[
-        [
-            "year",
-            "round",
-            "id_driver",
-            "name_driver_last",
-            "name_driver_first",
-            "name_team",
-            "session",
-            "position",
-            "time",
-        ]
-    ]
-
-    return df
+#     return df
 
 
-def get_df_event_raw(data_session: None) -> pd.DataFrame:
-    """
-    Retrieve event session data for a given year and round.
+# def get_df_race_raw(data_session: None) -> pd.DataFrame:
+#     """
+#     Retrieve race session data from a DataFrame.
 
-    Args:
-        data_session (None): Raw session data.
+#     Args:
+#         data_session (None): The raw race session data.
 
-    Returns:
-        pd.DataFrame: A DataFrame with the relevant columns from the event data.
-    """
+#     Returns:
+#         pd.DataFrame: A DataFrame containing the relevant columns from the race data.
+#     """
 
-    df = data_session.event[
-        ["RoundNumber", "Location", "EventDate", "Country"]
-    ].to_frame()
+#     df = data_session.results[
+#         [
+#             "DriverId",
+#             "LastName",
+#             "FirstName",
+#             "TeamName",
+#             "ClassifiedPosition",
+#             "Time",
+#         ]
+#     ]
 
-    return df
-
-
-def get_df_event_processed(df_raw: pd.DataFrame) -> pd.DataFrame:
-    """
-    Process the raw event data and return a processed DataFrame.
-
-    Args:
-        df_raw (pd.DataFrame): The raw event data DataFrame.
-
-    Returns:
-        pd.DataFrame: The processed event data DataFrame.
-    """
-
-    df = df_raw.T.reset_index(drop=True)
-
-    df.columns = df.columns.str.lower()
-    df.rename(
-        columns={
-            "roundnumber": "round",
-            "location": "circuit_name",
-            "country": "circuit_country",
-        },
-        inplace=True,
-    )
-
-    df["eventdate"] = pd.to_datetime(df["eventdate"])
-    df["year"] = df["eventdate"].dt.year
-    df["round"] = df["round"].astype(int)
-
-    return df
+#     return df
 
 
-def get_df_event_final(df_processed: pd.DataFrame) -> pd.DataFrame:
-    """
-    Returns a DataFrame containing the final event data.
+# def get_df_race_processed(df_raw: pd.DataFrame, year: int, round: int) -> pd.DataFrame:
+# """
+# Process the raw race data and return a processed DataFrame.
 
-    Args:
-        df_processed (pd.DataFrame): The processed DataFrame containing event data.
+# Args:
+#     df_raw (pd.DataFrame): The raw race data DataFrame.
+#     year (int): The year of the session.
+#     round (int): The round number of the session.
 
-    Returns:
-        pd.DataFrame: The DataFrame containing the final event data.
-    """
+# Returns:
+#     pd.DataFrame: The processed race data DataFrame.
+# """
 
-    df = df_processed[["year", "round", "circuit_name", "circuit_country"]]
+# df = df_raw.copy().reset_index(drop=True)
 
-    return df
+# df["year"] = year
+# df["round"] = round
+# df["session"] = "Race"
+
+# df.columns = df.columns.str.lower()
+# df.rename(
+#     columns={
+#         "classifiedposition": "position",
+#         "driverid": "id_driver",
+#         "lastname": "name_driver_last",
+#         "firstname": "name_driver_first",
+#         "teamname": "name_team",
+#     },
+#     inplace=True,
+# )
+# df.loc[1:, "time"] = df.loc[1:, "time"] + df.loc[0, "time"]
+
+# return df
+
+
+# def get_df_race_final(df_processed: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Returns a DataFrame containing the final race data.
+
+#     Args:
+#         df_processed (pd.DataFrame): The processed DataFrame containing race data.
+
+#     Returns:
+#         pd.DataFrame: The DataFrame containing the final race data.
+#     """
+
+#     df = df_processed[
+#         [
+#             "year",
+#             "round",
+#             "id_driver",
+#             "name_driver_last",
+#             "name_driver_first",
+#             "name_team",
+#             "session",
+#             "position",
+#             "time",
+#         ]
+#     ]
+
+#     return df
+
+
+# def get_df_event_raw(data_session: None) -> pd.DataFrame:
+#     """
+#     Retrieve event session data for a given year and round.
+
+#     Args:
+#         data_session (None): Raw session data.
+
+#     Returns:
+#         pd.DataFrame: A DataFrame with the relevant columns from the event data.
+#     """
+
+#     df = data_session.event[
+#         ["RoundNumber", "Location", "EventDate", "Country"]
+#     ].to_frame()
+
+#     return df
+
+
+# def get_df_event_processed(df_raw: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Process the raw event data and return a processed DataFrame.
+
+#     Args:
+#         df_raw (pd.DataFrame): The raw event data DataFrame.
+
+#     Returns:
+#         pd.DataFrame: The processed event data DataFrame.
+#     """
+
+#     df = df_raw.T.reset_index(drop=True)
+
+#     df.columns = df.columns.str.lower()
+#     df.rename(
+#         columns={
+#             "roundnumber": "round",
+#             "location": "circuit_name",
+#             "country": "circuit_country",
+#         },
+#         inplace=True,
+#     )
+
+#     df["eventdate"] = pd.to_datetime(df["eventdate"])
+#     df["year"] = df["eventdate"].dt.year
+#     df["round"] = df["round"].astype(int)
+
+#     return df
+
+
+# def get_df_event_final(df_processed: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Returns a DataFrame containing the final event data.
+
+#     Args:
+#         df_processed (pd.DataFrame): The processed DataFrame containing event data.
+
+#     Returns:
+#         pd.DataFrame: The DataFrame containing the final event data.
+#     """
+
+#     df = df_processed[["year", "round", "circuit_name", "circuit_country"]]
+
+#     return df
 
 
 def get_df_sessions(df_quali: pd.DataFrame, df_race: pd.DataFrame) -> pd.DataFrame:

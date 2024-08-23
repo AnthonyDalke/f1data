@@ -1,25 +1,116 @@
 import pandas as pd
 
+
 class DataRace:
     def __init__(self):
         self.df_race_raw = None
         self.df_race_processed = None
         self.df_race_final = None
 
-    def __get_df_race_raw(self):
-        # Your logic to produce the raw dataframe
-        self.df_race_raw = pd.DataFrame()  # Replace with actual logic
-        return self.df_race_raw
+    def __get_df_raw(self, data_session: object) -> pd.DataFrame:
+        """
+        Retrieve race session data from a DataFrame.
 
-    def __get_df_race_processed(self, df_race_raw, year, some_int):
-        # Your logic to process the raw dataframe using year and some_int
-        self.df_race_processed = pd.DataFrame()  # Replace with actual logic
-        return self.df_race_processed
+        Args:
+            data_session (object): The raw race session data.
 
-    def get_df_race_final(self, year, some_int):
-        # Automatically call the intermediate steps
-        df_race_raw = self.__get_df_race_raw()
-        df_race_processed = self.__get_df_race_processed(df_race_raw, year, some_int)
-        # Your logic to produce the final dataframe
-        self.df_race_final = pd.DataFrame()  # Replace with actual logic
-        return self.df_race_final
+        Returns:
+            pd.DataFrame: A DataFrame containing the relevant columns from the race data.
+        """
+
+        self.df_raw = data_session.results[
+            [
+                "DriverId",
+                "LastName",
+                "FirstName",
+                "TeamName",
+                "ClassifiedPosition",
+                "Time",
+            ]
+        ]
+
+        return self.df_raw
+
+    def __get_df_processed(
+        self, df_raw: pd.DataFrame, year: int, round: int
+    ) -> pd.DataFrame:
+        """
+        Process the raw race data and return a processed DataFrame.
+
+        Args:
+            df_raw (pd.DataFrame): The raw race data DataFrame.
+            year (int): The year of the session.
+            round (int): The round number of the session.
+
+        Returns:
+            pd.DataFrame: The processed race data DataFrame.
+        """
+
+        self.df_processed = df_raw.copy().reset_index(drop=True)
+
+        self.df_processed["year"] = year
+        self.df_processed["round"] = round
+        self.df_processed["session"] = "Race"
+
+        self.df_processed.columns = self.df_processed.columns.str.lower()
+        self.df_processed.rename(
+            columns={
+                "classifiedposition": "position",
+                "driverid": "id_driver",
+                "lastname": "name_driver_last",
+                "firstname": "name_driver_first",
+                "teamname": "name_team",
+            },
+            inplace=True,
+        )
+        self.df_processed.loc[1:, "time"] = (
+            self.df_processed.loc[1:, "time"] + self.df_processed.loc[0, "time"]
+        )
+
+        return self.df_processed
+
+    def __get_df_final(self, df_processed: pd.DataFrame) -> pd.DataFrame:
+        """
+        Returns a DataFrame containing the final race data.
+
+        Args:
+            df_processed (pd.DataFrame): The processed DataFrame containing race data.
+
+        Returns:
+            pd.DataFrame: The DataFrame containing the final race data.
+        """
+
+        self.df_final = df_processed[
+            [
+                "year",
+                "round",
+                "id_driver",
+                "name_driver_last",
+                "name_driver_first",
+                "name_team",
+                "session",
+                "position",
+                "time",
+            ]
+        ]
+
+        return self.df_final
+
+    def get_df_race(self, data_session: object, year: int, round: int) -> pd.DataFrame:
+        """
+        Retrieves the final DataFrame containing the race session data.
+
+        Args:
+            data_session (object): The raw race session data.
+            year (int): The year of the session.
+            round (int): The round number of the session.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the race session data.
+        """
+
+        df_raw = self.__get_df_raw(data_session)
+        df_processed = self.__get_df_processed(df_raw, year, round)
+        df_final = self.__get_df_final(df_processed)
+
+        return df_final

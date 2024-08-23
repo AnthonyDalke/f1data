@@ -7,7 +7,7 @@ class DataQuali:
         self.df_quali_processed = None
         self.df_quali_final = None
 
-    def __get_df_quali_raw(self, data_session) -> pd.DataFrame:
+    def __get_df_raw(self, data_session: object) -> pd.DataFrame:
         """
         Retrieve qualifying session data from a DataFrame.
 
@@ -17,6 +17,7 @@ class DataQuali:
         Returns:
             pd.DataFrame: A DataFrame containing the relevant columns from the qualifying data.
         """
+
         self.df_raw = data_session.results[
             [
                 "Q1",
@@ -29,9 +30,10 @@ class DataQuali:
                 "Position",
             ]
         ]
+
         return self.df_raw
 
-    def __get_df_quali_processed(
+    def __get_df_processed(
         self, df_raw: pd.DataFrame, year: int, round: int
     ) -> pd.DataFrame:
         """
@@ -52,6 +54,7 @@ class DataQuali:
                 - time: The qualifying time.
                 - position: The qualifying position of the driver in the session.
         """
+
         self.df_processed = df_raw.melt(
             id_vars=["DriverId", "LastName", "FirstName", "TeamName", "Position"],
             value_vars=["Q1", "Q2", "Q3"],
@@ -85,7 +88,7 @@ class DataQuali:
 
         return self.df_processed
 
-    def __get_df_quali_final(self, df_processed: pd.DataFrame) -> pd.DataFrame:
+    def __get_df_final(self, df_processed: pd.DataFrame) -> pd.DataFrame:
         """
         Extracts the required columns from the processed DataFrame and returns a new DataFrame.
 
@@ -102,6 +105,7 @@ class DataQuali:
                 - position: The position of the driver in the race.
                 - time: The time taken by the driver in the race.
         """
+
         self.df_final = df_processed[
             [
                 "year",
@@ -115,9 +119,10 @@ class DataQuali:
                 "time",
             ]
         ]
+
         return self.df_final
 
-    def get_df_quali(self, data_session, year, round) -> pd.DataFrame:
+    def get_df_quali(self, data_session: object, year, round) -> pd.DataFrame:
         """
         Retrieves the final DataFrame containing the qualifying session data.
 
@@ -129,9 +134,9 @@ class DataQuali:
         Returns:
             pd.DataFrame: A DataFrame containing the qualifying session data.
         """
-        # Automatically call the intermediate steps
-        df_raw = self.__get_df_quali_raw(data_session)
-        df_processed = self.__get_df_quali_processed(df_raw, year, round)
-        df_final = self.__get_df_quali_final(df_processed)
+
+        df_raw = self.__get_df_raw(data_session)
+        df_processed = self.__get_df_processed(df_raw, year, round)
+        df_final = self.__get_df_final(df_processed)
 
         return df_final
