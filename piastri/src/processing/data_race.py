@@ -3,9 +3,9 @@ import pandas as pd
 
 class DataRace:
     def __init__(self):
-        self.df_race_raw = None
-        self.df_race_processed = None
-        self.df_race_final = None
+        self.df_raw = None
+        self.df_processed = None
+        self.df_final = None
 
     def __get_df_raw(self, data_session: object) -> pd.DataFrame:
         """
@@ -18,16 +18,19 @@ class DataRace:
             pd.DataFrame: A DataFrame containing the relevant columns from the race data.
         """
 
-        self.df_raw = data_session.results[
-            [
-                "DriverId",
-                "LastName",
-                "FirstName",
-                "TeamName",
-                "ClassifiedPosition",
-                "Time",
-            ]
+        col_required = [
+            "DriverId",
+            "LastName",
+            "FirstName",
+            "TeamName",
+            "ClassifiedPosition",
+            "Time",
         ]
+
+        try:
+            self.df_raw = data_session.results[col_required].copy()
+        except KeyError as e:
+            raise ValueError(f"Session data doesn't contain the required columns: {e}.")
 
         return self.df_raw
 

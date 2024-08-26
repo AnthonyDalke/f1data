@@ -353,98 +353,98 @@ def get_df_denormalized(
     return df_denormalized
 
 
-def get_df_events(df_event: pd.DataFrame) -> pd.DataFrame:
-    """
-    Get a DataFrame isolating normalized event data.
+# def get_df_events(df_event: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Get a DataFrame isolating normalized event data.
 
-    Args:
-        df_event (pd.DataFrame): The input DataFrame containing event data.
+#     Args:
+#         df_event (pd.DataFrame): The input DataFrame containing event data.
 
-    Returns:
-        pd.DataFrame: Normalized DataFrame with columns 'year', 'round', and 'circuit_name'.
-    """
+#     Returns:
+#         pd.DataFrame: Normalized DataFrame with columns 'year', 'round', and 'circuit_name'.
+#     """
 
-    df = df_event[["year", "round", "circuit_name"]].reset_index(drop=True)
+#     df = df_event[["year", "round", "circuit_name"]].reset_index(drop=True)
 
-    return df
-
-
-def get_df_drivers(df_sessions: pd.DataFrame) -> pd.DataFrame:
-    """
-    Get a DataFrame isolating normalized driver data.
-
-    Args:
-        df_event (pd.DataFrame): The input DataFrame containing driver data.
-
-    Returns:
-        pd.DataFrame: Normalized DataFrame with columns.
-            'id_driver', 'name_driver_last', and 'name_driver_first'.
-    """
-
-    df = (
-        df_sessions[["id_driver", "name_driver_last", "name_driver_first"]]
-        .drop_duplicates()
-        .reset_index(drop=True)
-    )
-
-    return df
+#     return df
 
 
-def get_df_teams(df_sessions: pd.DataFrame) -> pd.DataFrame:
-    """
-    Get a DataFrame isolating normalized team data.
+# def get_df_drivers(df_sessions: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Get a DataFrame isolating normalized driver data.
 
-    Args:
-        df_event (pd.DataFrame): The input DataFrame containing team data.
+#     Args:
+#         df_event (pd.DataFrame): The input DataFrame containing driver data.
 
-    Returns:
-        pd.DataFrame: Normalized DataFrame with columns.
-            'name_team', 'year', and 'id_driver'.
-    """
+#     Returns:
+#         pd.DataFrame: Normalized DataFrame with columns.
+#             'id_driver', 'name_driver_last', and 'name_driver_first'.
+#     """
 
-    df = (
-        df_sessions[["name_team", "year", "id_driver"]]
-        .drop_duplicates()
-        .reset_index(drop=True)
-    )
+#     df = (
+#         df_sessions[["id_driver", "name_driver_last", "name_driver_first"]]
+#         .drop_duplicates()
+#         .reset_index(drop=True)
+#     )
 
-    return df
-
-
-def get_df_circuits(df_event: pd.DataFrame) -> pd.DataFrame:
-    """
-    Get a DataFrame isolating normalized circuit data.
-
-    Args:
-        df_event (pd.DataFrame): The input DataFrame containing circuit data.
-
-    Returns:
-        pd.DataFrame: Normalized DataFrame with columns.
-            'circuit_name' and 'circuit_country'.
-    """
-
-    df = df_event[["circuit_name", "circuit_country"]].reset_index(drop=True)
-
-    return df
+#     return df
 
 
-def get_df_results(df_sessions: pd.DataFrame) -> pd.DataFrame:
-    """
-    Get a DataFrame isolating normalized result data.
+# def get_df_teams(df_sessions: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Get a DataFrame isolating normalized team data.
 
-    Args:
-        df_event (pd.DataFrame): The input DataFrame containing result data.
+#     Args:
+#         df_event (pd.DataFrame): The input DataFrame containing team data.
 
-    Returns:
-        pd.DataFrame: Normalized DataFrame with columns.
-            'year', 'round', 'id_driver', 'name_team', 'session', 'position' and 'time'.
-    """
+#     Returns:
+#         pd.DataFrame: Normalized DataFrame with columns.
+#             'name_team', 'year', and 'id_driver'.
+#     """
 
-    df = df_sessions[
-        ["year", "round", "id_driver", "name_team", "session", "position", "time"]
-    ].reset_index(drop=True)
+#     df = (
+#         df_sessions[["name_team", "year", "id_driver"]]
+#         .drop_duplicates()
+#         .reset_index(drop=True)
+#     )
 
-    return df
+#     return df
+
+
+# def get_df_circuits(df_event: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Get a DataFrame isolating normalized circuit data.
+
+#     Args:
+#         df_event (pd.DataFrame): The input DataFrame containing circuit data.
+
+#     Returns:
+#         pd.DataFrame: Normalized DataFrame with columns.
+#             'circuit_name' and 'circuit_country'.
+#     """
+
+#     df = df_event[["circuit_name", "circuit_country"]].reset_index(drop=True)
+
+#     return df
+
+
+# def get_df_results(df_sessions: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Get a DataFrame isolating normalized result data.
+
+#     Args:
+#         df_event (pd.DataFrame): The input DataFrame containing result data.
+
+#     Returns:
+#         pd.DataFrame: Normalized DataFrame with columns.
+#             'year', 'round', 'id_driver', 'name_team', 'session', 'position' and 'time'.
+#     """
+
+#     df = df_sessions[
+#         ["year", "round", "id_driver", "name_team", "session", "position", "time"]
+#     ].reset_index(drop=True)
+
+#     return df
 
 
 def get_env_var(filename: str) -> None:
@@ -463,6 +463,19 @@ def get_env_var(filename: str) -> None:
             if line.strip():
                 key, value = line.strip().split("=", 1)
                 os.environ[key] = value
+
+
+def set_env_var():
+    db_name = os.environ["POSTGRES_DB"]
+    db_user = os.environ["POSTGRES_USER"]
+    db_password = os.environ["POSTGRES_PASSWORD"]
+    db_host = "localhost"
+    db_port = "5432"
+
+    year_start = int(os.environ["year_start"])
+    year_end = int(os.environ["year_end"])
+
+    return db_name, db_user, db_password, db_host, db_port, year_start, year_end
 
 
 def write_df_postgres(

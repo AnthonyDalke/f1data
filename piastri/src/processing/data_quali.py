@@ -3,9 +3,9 @@ import pandas as pd
 
 class DataQuali:
     def __init__(self):
-        self.df_quali_raw = None
-        self.df_quali_processed = None
-        self.df_quali_final = None
+        self.df_raw = None
+        self.df_processed = None
+        self.df_final = None
 
     def __get_df_raw(self, data_session: object) -> pd.DataFrame:
         """
@@ -18,18 +18,21 @@ class DataQuali:
             pd.DataFrame: A DataFrame containing the relevant columns from the qualifying data.
         """
 
-        self.df_raw = data_session.results[
-            [
-                "Q1",
-                "Q2",
-                "Q3",
-                "DriverId",
-                "LastName",
-                "FirstName",
-                "TeamName",
-                "Position",
-            ]
+        col_required = [
+            "Q1",
+            "Q2",
+            "Q3",
+            "DriverId",
+            "LastName",
+            "FirstName",
+            "TeamName",
+            "Position",
         ]
+
+        try:
+            self.df_raw = data_session.results[col_required].copy()
+        except KeyError as e:
+            raise ValueError(f"Session data doesn't contain the required columns: {e}.")
 
         return self.df_raw
 
