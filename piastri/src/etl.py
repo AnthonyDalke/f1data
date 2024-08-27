@@ -29,6 +29,17 @@ logger.setLevel(logging.INFO)
 def extract_transform_history(
     list_years: List[int],
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Extracts and transforms historical data for qualifying, race, and event sessions for multiple years and rounds.
+    Args:
+        list_years (List[int]): A list of years to extract and transform.
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: A tuple containing three pandas DataFrames:
+            - df_quali_all: DataFrame containing qualifying session data for all years and rounds.
+            - df_race_all: DataFrame containing race session data for all years and rounds.
+            - df_event_all: DataFrame containing event data for all years and rounds.
+    """
+
     df_quali_all = []
     df_race_all = []
     df_event_all = []
@@ -71,7 +82,26 @@ def extract_transform_history(
 
 def extract_transform_tables(
     df_quali_all: pd.DataFrame, df_race_all: pd.DataFrame, df_event_all: pd.DataFrame
-):
+) -> Tuple[
+    pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame
+]:
+    """
+    Extracts and transforms data from multiple dataframes to generate denormalized tables.
+    Args:
+        df_quali_all (pd.DataFrame): The dataframe containing qualifying data.
+        df_race_all (pd.DataFrame): The dataframe containing race data.
+        df_event_all (pd.DataFrame): The dataframe containing event data.
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+            A tuple of dataframes representing the denormalized tables:
+            - df_denormalized: The dataframe for the denormalized table.
+            - df_events: The dataframe containing normalized event data.
+            - df_drivers: The dataframe containing normalized driver data.
+            - df_teams: The dataframe containing normalized team data.
+            - df_circuits: The dataframe containing normalized circuit data.
+            - df_results: The dataframe containing normalized result data.
+    """
+
     df_sessions_all = get_df_sessions(df_quali_all, df_race_all)
     df_denormalized = get_df_denormalized(df_sessions_all, df_event_all)
     df_events = DataNormalized.get_df_events(df_event_all)
@@ -96,6 +126,25 @@ def load_postgres(
     df_circuits: pd.DataFrame,
     df_results: pd.DataFrame,
 ) -> None:
+    """
+    Loads the given DataFrames into corresponding tables in Postgres.
+
+    Args:
+        db_user (str): The username for the PostgreSQL database.
+        db_password (str): The password for the PostgreSQL database.
+        db_name (str): The name of the PostgreSQL database.
+        db_host (str): The host address of the PostgreSQL database.
+        db_port (str): The port number of the PostgreSQL database.
+        df_denormalized (pd.DataFrame): The DataFrame containing denormalized data.
+        df_events (pd.DataFrame): The DataFrame containing event data.
+        df_drivers (pd.DataFrame): The DataFrame containing driver data.
+        df_teams (pd.DataFrame): The DataFrame containing team data.
+        df_circuits (pd.DataFrame): The DataFrame containing circuit data.
+        df_results (pd.DataFrame): The DataFrame containing result data.
+
+    Returns:
+        None
+    """
 
     dict_df = {
         "df_denormalized": df_denormalized,
@@ -139,6 +188,24 @@ def load_postgres(
 
 
 def main():
+    """
+    Main function for ETL process.
+
+    This function performs the following steps:
+    1. Retrieves environment variables from the ".env" file.
+    2. Sets environment variables for database connection.
+    3. Retrieves a list of years based on the start and end year provided.
+    4. Extracts and transforms historical data for the specified years.
+    5. Extracts and transforms historical data to load in Postgres tables.
+    6. Loads the transformed data into a Postgres.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
+
     get_env_var(".env")
 
     db_name, db_user, db_password, db_host, db_port, year_start, year_end = (
