@@ -23,3 +23,6 @@ services:
       - db
     env_file:
       - .env
+    environment:
+      - VIRTUAL_ENV=/app/venv
+      - PATH=/app/venv/bin:$PATH
