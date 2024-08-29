@@ -125,7 +125,7 @@ class DataQuali:
 
         return self.df_final
 
-    def get_df_quali(self, data_session: object, year, round) -> pd.DataFrame:
+    def get_df_quali(self, data_session: object, year: int, round: int) -> pd.DataFrame:
         """
         Retrieves the final DataFrame containing the qualifying session data.
 
