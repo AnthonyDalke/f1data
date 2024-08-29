@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS sessions.drivers (
 );
 
 CREATE TABLE IF NOT EXISTS sessions.teams (
-    name_team TEXT PRIMARY KEY,
+    name_team TEXT NOT NULL,
     year SMALLINT NOT NULL,
     id_driver TEXT NOT NULL,
     PRIMARY KEY (name_team, year)
