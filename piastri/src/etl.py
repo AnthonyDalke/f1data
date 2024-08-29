@@ -55,19 +55,22 @@ def extract_transform_history(
                 f"Retrieved qualifying and race session data for round {round} of {year}."
             )
 
-            df_quali = DataQuali.get_df_quali(data_session_quali, year, round)
+            instance_quali = DataQuali()
+            df_quali = instance_quali.get_df_quali(data_session_quali, year, round)
             df_quali_all.append(df_quali)
             logger.info(f"Retrieved qualifying dataframe for round {round} of {year}.")
 
             time.sleep(3)
 
-            df_race = DataRace.get_df_race(data_session_race, year, round)
+            instance_race = DataRace()
+            df_race = instance_race.get_df_race(data_session_race, year, round)
             df_race_all.append(df_race)
             logger.info(f"Retrieved race dataframe for round {round} of {year}.")
 
             time.sleep(3)
 
-            df_event = DataEvent.get_df_event(data_session_race)
+            instance_event = DataEvent()
+            df_event = instance_event.get_df_event(data_session_race)
             df_event_all.append(df_event)
             logger.info(f"Retrieved event dataframe for round {round} of {year}.")
 
