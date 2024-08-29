@@ -105,13 +105,15 @@ def extract_transform_tables(
             - df_results: The dataframe containing normalized result data.
     """
 
+    instance_normalized = DataNormalized()
+
     df_sessions_all = get_df_sessions(df_quali_all, df_race_all)
     df_denormalized = get_df_denormalized(df_sessions_all, df_event_all)
-    df_events = DataNormalized.get_df_events(df_event_all)
-    df_drivers = DataNormalized.get_df_drivers(df_sessions_all)
-    df_teams = DataNormalized.get_df_teams(df_sessions_all)
-    df_circuits = DataNormalized.get_df_circuits(df_event_all)
-    df_results = DataNormalized.get_df_results(df_sessions_all)
+    df_events = instance_normalized.get_df_events(df_event_all)
+    df_drivers = instance_normalized.get_df_drivers(df_sessions_all)
+    df_teams = instance_normalized.get_df_teams(df_sessions_all)
+    df_circuits = instance_normalized.get_df_circuits(df_event_all)
+    df_results = instance_normalized.get_df_results(df_sessions_all)
 
     return df_denormalized, df_events, df_drivers, df_teams, df_circuits, df_results
 
