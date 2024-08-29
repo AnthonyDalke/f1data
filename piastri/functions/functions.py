@@ -472,8 +472,8 @@ def set_env_var():
     db_host = "localhost"
     db_port = "5432"
 
-    year_start = int(os.environ["year_start"])
-    year_end = int(os.environ["year_end"])
+    year_start = int(os.environ["YEAR_START"])
+    year_end = int(os.environ["YEAR_END"])
 
     return db_name, db_user, db_password, db_host, db_port, year_start, year_end
 
