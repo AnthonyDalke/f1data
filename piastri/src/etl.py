@@ -1,10 +1,9 @@
-import logging
-import os
 import pandas as pd
 import time
 from typing import List, Tuple
 
 from functions.functions import (
+    email_missing_data,
     get_years,
     get_rounds,
     get_data_session,
@@ -14,16 +13,14 @@ from functions.functions import (
     set_env_var,
     write_df_postgres,
 )
-
+from functions.logging_config import setup_logger
 from .processing.data_quali import DataQuali
 from .processing.data_race import DataRace
 from .processing.data_event import DataEvent
 from .processing.data_normalized import DataNormalized
 
-logger = logging.getLogger("piastri")
-handler = logging.StreamHandler()
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+
+logger = setup_logger("etl")
 
 
 def extract_transform_history(
@@ -44,35 +41,89 @@ def extract_transform_history(
     df_race_all = []
     df_event_all = []
 
+    session_missing = {}
+    quali_missing = {}
+    race_missing = {}
+    event_missing = {}
+
+    instance_quali = DataQuali()
+    instance_race = DataRace()
+    instance_event = DataEvent()
+
     for year in list_years:
         logger.info(f"year: {year}")
         list_rounds = get_rounds(year)
 
         for round in list_rounds:
-            data_session_quali = get_data_session(year, round, "Q")
-            data_session_race = get_data_session(year, round, "R")
-            logger.info(
-                f"Retrieved qualifying and race session data for round {round} of {year}."
-            )
+            try:
+                data_session_quali = get_data_session(year, round, "Q")
+                data_session_race = get_data_session(year, round, "R")
 
-            instance_quali = DataQuali()
-            df_quali = instance_quali.get_df_quali(data_session_quali, year, round)
-            df_quali_all.append(df_quali)
-            logger.info(f"Retrieved qualifying dataframe for round {round} of {year}.")
+                logger.info(
+                    f"Retrieved qualifying and race session data for round {round} of {year}."
+                )
+            except Exception as e:
+                logger.error(
+                    f"Error retrieving session data for round {round} of {year}: {e}."
+                )
+
+                if year not in session_missing:
+                    session_missing[year] = []
+                session_missing[year].append(round)
+
+                continue
+
+            try:
+                df_quali = instance_quali.get_df_quali(data_session_quali, year, round)
+                df_quali_all.append(df_quali)
+
+                logger.info(
+                    f"Retrieved qualifying dataframe for round {round} of {year}."
+                )
+            except Exception as e:
+                logger.error(
+                    f"Error retrieving qualifying data for round {round} of {year}: {e}."
+                )
+
+                if year not in quali_missing:
+                    quali_missing[year] = []
+                quali_missing[year].append(round)
+
+                continue
 
             time.sleep(3)
 
-            instance_race = DataRace()
-            df_race = instance_race.get_df_race(data_session_race, year, round)
-            df_race_all.append(df_race)
-            logger.info(f"Retrieved race dataframe for round {round} of {year}.")
+            try:
+                df_race = instance_race.get_df_race(data_session_race, year, round)
+                df_race_all.append(df_race)
+
+                logger.info(f"Retrieved race dataframe for round {round} of {year}.")
+            except Exception as e:
+                logger.error(
+                    f"Error retrieving race data for round {round} of {year}: {e}."
+                )
+
+                if year not in race_missing:
+                    race_missing[year] = []
+                race_missing[year].append(round)
+
+                continue
 
             time.sleep(3)
 
-            instance_event = DataEvent()
-            df_event = instance_event.get_df_event(data_session_race)
-            df_event_all.append(df_event)
-            logger.info(f"Retrieved event dataframe for round {round} of {year}.")
+            try:
+                df_event = instance_event.get_df_event(data_session_race)
+                df_event_all.append(df_event)
+
+                logger.info(f"Retrieved event dataframe for round {round} of {year}.")
+            except Exception as e:
+                logger.error(
+                    f"Error retrieving event data for round {round} of {year}: {e}."
+                )
+
+                if year not in event_missing:
+                    event_missing[year] = []
+                event_missing[year].append(round)
 
             time.sleep(3)
 
@@ -80,7 +131,15 @@ def extract_transform_history(
     df_race_all = pd.concat(df_race_all, ignore_index=True)
     df_event_all = pd.concat(df_event_all, ignore_index=True)
 
-    return df_quali_all, df_race_all, df_event_all
+    return (
+        df_quali_all,
+        df_race_all,
+        df_event_all,
+        session_missing,
+        quali_missing,
+        race_missing,
+        event_missing,
+    )
 
 
 def extract_transform_tables(
@@ -201,8 +260,9 @@ def main():
     2. Sets environment variables for database connection.
     3. Retrieves a list of years based on the start and end year provided.
     4. Extracts and transforms historical data for the specified years.
-    5. Extracts and transforms historical data to load in Postgres tables.
-    6. Loads the transformed data into a Postgres.
+    5. Emails any failed data fetching.
+    6. Extracts and transforms historical data to load in Postgres tables.
+    7. Loads the transformed data into a Postgres.
 
     Parameters:
     None
@@ -213,13 +273,23 @@ def main():
 
     get_env_var(".env")
 
-    db_name, db_user, db_password, db_host, db_port, year_start, year_end = (
+    db_name, db_user, db_password, db_host, db_port, year_start, year_end, pw = (
         set_env_var()
     )
 
     list_years = get_years(year_start, year_end)
 
-    df_quali_all, df_race_all, df_event_all = extract_transform_history(list_years)
+    (
+        df_quali_all,
+        df_race_all,
+        df_event_all,
+        session_missing,
+        quali_missing,
+        race_missing,
+        event_missing,
+    ) = extract_transform_history(list_years)
+
+    email_missing_data(session_missing, quali_missing, race_missing, event_missing, pw)
 
     df_denormalized, df_events, df_drivers, df_teams, df_circuits, df_results = (
         extract_transform_tables(df_quali_all, df_race_all, df_event_all)
