@@ -1,10 +1,20 @@
+import json
+import os
+import smtplib
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from typing import Dict, List
+
 import fastf1 as ff1
 import pandas as pd
-import os
 
+from logging_config import setup_logger
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.dialects.postgresql import insert
-from typing import Dict, List
+
+
+logger = setup_logger("functions")
 
 
 def get_years(start: int, end: int) -> List[int]:
@@ -517,3 +527,56 @@ def write_df_postgres(
 
     with engine.begin() as connection:
         connection.execute(stmt)
+
+
+def email_missing_data(
+    session: Dict[List], quali: Dict[List], race: Dict[List], event: Dict[List], pw: str
+) -> None:
+    """
+    Email the years and rounds with missing data, for triage.
+
+    Args:
+        session (Dict[List]): A dictionary containing missing session data.
+        quali (Dict[List]): A dictionary containing missing qualifying data.
+        race (Dict[List]): A dictionary containing missing race data.
+        event (Dict[List]): A dictionary containing missing event data.
+    """
+
+    session_str = json.dumps(session, indent=4)
+    quali_str = json.dumps(quali, indent=4)
+    race_str = json.dumps(race, indent=4)
+    event_str = json.dumps(event, indent=4)
+
+    sender_email = "anthony.dalke@gmail.com"
+    receiver_email = "anthony.dalke@gmail.com"
+    subject = "Missing Data for F1 ETL Run"
+    body = (
+        f"Session Missing:\n{session_str}\n\n"
+        f"Quali Missing:\n{quali_str}\n\n"
+        f"Race Missing:\n{race_str}\n\n"
+        f"Event Missing:\n{event_str}"
+    )
+
+    msg = MIMEMultipart()
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg["Subject"] = subject
+
+    msg.attach(MIMEText(body, "plain"))
+
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    smtp_user = "anthony.dalke@gmail.com"
+    smtp_password = pw
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        text = msg.as_string()
+        server.sendmail(sender_email, receiver_email, text)
+        server.quit()
+
+        logger.info("Emailed details of missing data.")
+    except Exception as e:
+        logger.error(f"Failed to email details of missing data due to error {e}.")
