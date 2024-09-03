@@ -7,17 +7,11 @@ WORKDIR /app
 # Set the Python path to include /app
 ENV PYTHONPATH /app:$PYTHONPATH
 
-# Add the current directory contents into the container at /app
-ADD . /app
-
-# Copy the requirements.txt file into the container
-COPY requirements.txt /app/
+# Copy the files from local storage to the container
+COPY . /app
 
 # Upgrade pip and install dependencies directly
 RUN pip install --upgrade pip && pip install --no-cache-dir -r /app/requirements.txt
-
-# Make port 80 available to the world outside this container
-EXPOSE 80
 
 # Run etl.py when the container launches
 CMD ["python", "-m", "src.etl"]
