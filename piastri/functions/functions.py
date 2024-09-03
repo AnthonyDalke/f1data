@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import smtplib
 
@@ -9,12 +10,31 @@ from typing import Dict, List
 import fastf1 as ff1
 import pandas as pd
 
-from logging_config import setup_logger
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.dialects.postgresql import insert
 
 
-logger = setup_logger("functions")
+def setup_logger(name: str) -> logging.Logger:
+    """
+    Set up a logger with the specified name.
+
+    Args:
+        name (str): The name of the logger.
+
+    Returns:
+        logging.Logger: The configured logger object.
+    """
+
+    logger = logging.getLogger(name)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+
+    return logger
 
 
 def get_years(start: int, end: int) -> List[int]:
@@ -479,13 +499,15 @@ def set_env_var():
     db_name = os.environ["POSTGRES_DB"]
     db_user = os.environ["POSTGRES_USER"]
     db_password = os.environ["POSTGRES_PASSWORD"]
-    db_host = "localhost"
-    db_port = "5432"
+    db_host = os.environ["POSTGRES_HOST"]
+    db_port = os.environ["POSTGRES_PORT"]
 
     year_start = int(os.environ["YEAR_START"])
     year_end = int(os.environ["YEAR_END"])
 
-    return db_name, db_user, db_password, db_host, db_port, year_start, year_end
+    pw = os.environ["EMAIL_PW"]
+
+    return db_name, db_user, db_password, db_host, db_port, year_start, year_end, pw
 
 
 def write_df_postgres(
@@ -523,14 +545,19 @@ def write_df_postgres(
     data = df.to_dict("records")
 
     stmt = insert(obj_table).values(data)
-    stmt = stmt.on_conflict_do_nothing(index_elements={keys})
+    stmt = stmt.on_conflict_do_nothing(index_elements=keys)
 
     with engine.begin() as connection:
         connection.execute(stmt)
 
 
 def email_missing_data(
-    session: Dict[List], quali: Dict[List], race: Dict[List], event: Dict[List], pw: str
+    session: Dict[str, List],
+    quali: Dict[str, List],
+    race: Dict[str, List],
+    event: Dict[str, List],
+    pw: str,
+    logger: logging.Logger,
 ) -> None:
     """
     Email the years and rounds with missing data, for triage.
