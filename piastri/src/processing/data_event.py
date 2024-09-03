@@ -41,8 +41,8 @@ class DataEvent:
         self.df_processed.rename(
             columns={
                 "roundnumber": "round",
-                "location": "circuit_name",
-                "country": "circuit_country",
+                "location": "name_circuit",
+                "country": "country_circuit",
             },
             inplace=True,
         )
@@ -65,7 +65,7 @@ class DataEvent:
         """
 
         self.df_final = df_processed[
-            ["year", "round", "circuit_name", "circuit_country"]
+            ["year", "round", "name_circuit", "country_circuit"]
         ]
 
         return self.df_final

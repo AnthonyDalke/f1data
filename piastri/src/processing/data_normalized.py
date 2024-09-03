@@ -17,10 +17,10 @@ class DataNormalized:
             df_event (pd.DataFrame): The input DataFrame containing event data.
 
         Returns:
-            pd.DataFrame: Normalized DataFrame with columns 'year', 'round', and 'circuit_name'.
+            pd.DataFrame: Normalized DataFrame with columns 'year', 'round', and 'name_circuit'.
         """
 
-        self.df_events = df_event[["year", "round", "circuit_name"]].reset_index(
+        self.df_events = df_event[["year", "round", "name_circuit"]].reset_index(
             drop=True
         )
 
@@ -75,10 +75,10 @@ class DataNormalized:
 
         Returns:
             pd.DataFrame: Normalized DataFrame with columns.
-                'circuit_name' and 'circuit_country'.
+                'name_circuit' and 'country_circuit'.
         """
 
-        self.df_circuits = df_event[["circuit_name", "circuit_country"]].reset_index(
+        self.df_circuits = df_event[["name_circuit", "country_circuit"]].reset_index(
             drop=True
         )
 
