@@ -67,6 +67,7 @@ class DataQuali:
 
         self.df_processed.columns = self.df_processed.columns.str.lower()
 
+        self.df_processed = self.df_processed.dropna(subset=["time"])
         self.df_processed["year"] = year
         self.df_processed["round"] = round
         self.df_processed["originalposition"] = self.df_processed["position"]
