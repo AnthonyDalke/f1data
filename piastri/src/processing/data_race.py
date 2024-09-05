@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -68,6 +69,10 @@ class DataRace:
         )
         self.df_processed.loc[1:, "time"] = (
             self.df_processed.loc[1:, "time"] + self.df_processed.loc[0, "time"]
+        )
+        self.df_processed.loc[self.df_processed["time"].isna(), "position"] = "DNF"
+        self.df_processed["time"] = (
+            self.df_processed["time"].fillna(np.nan).replace([np.nan], [None])
         )
 
         return self.df_processed

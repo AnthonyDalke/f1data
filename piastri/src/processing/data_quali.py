@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -67,7 +68,10 @@ class DataQuali:
 
         self.df_processed.columns = self.df_processed.columns.str.lower()
 
-        self.df_processed = self.df_processed.dropna(subset=["time"])
+        self.df_processed["time"] = (
+            self.df_processed["time"].fillna(np.nan).replace([np.nan], [None])
+        )
+        self.df_processed.loc[self.df_processed["time"].isna(), "position"] = "DNQ"
         self.df_processed["year"] = year
         self.df_processed["round"] = round
         self.df_processed["originalposition"] = self.df_processed["position"]
