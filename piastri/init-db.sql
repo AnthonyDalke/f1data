@@ -1,6 +1,9 @@
-CREATE SCHEMA sessions;
+\c f1_db;
+SET search_path TO sessions;
 
-CREATE TABLE IF NOT EXISTS sessions.events_denormalized (
+CREATE SCHEMA IF NOT EXISTS sessions;
+
+CREATE TABLE IF NOT EXISTS events_denormalized (
     year SMALLINT NOT NULL,
     round SMALLINT NOT NULL,
     name_circuit TEXT NOT NULL,
@@ -11,35 +14,36 @@ CREATE TABLE IF NOT EXISTS sessions.events_denormalized (
     name_team TEXT NOT NULL,
     session TEXT NOT NULL,
     position TEXT NOT NULL,
-    time INTERVAL NULL
+    time INTERVAL NULL, 
+    PRIMARY KEY (year, round, id_driver, session)
 );
 
-CREATE TABLE IF NOT EXISTS sessions.events (
+CREATE TABLE IF NOT EXISTS events (
     year SMALLINT NOT NULL,
     round SMALLINT NOT NULL,
     name_circuit TEXT NOT NULL,
     PRIMARY KEY (year, round)
 );
 
-CREATE TABLE IF NOT EXISTS sessions.drivers (
+CREATE TABLE IF NOT EXISTS drivers (
     id_driver TEXT PRIMARY KEY,
-    name_last TEXT NOT NULL,
-    name_first TEXT NOT NULL
+    name_driver_last TEXT NOT NULL,
+    name_driver_first TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS sessions.teams (
+CREATE TABLE IF NOT EXISTS teams (
     name_team TEXT NOT NULL,
     year SMALLINT NOT NULL,
     id_driver TEXT NOT NULL,
     PRIMARY KEY (name_team, year)
 );
 
-CREATE TABLE IF NOT EXISTS sessions.circuits (
+CREATE TABLE IF NOT EXISTS circuits (
     name_circuit TEXT PRIMARY KEY,
     country_circuit TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS sessions.results (
+CREATE TABLE IF NOT EXISTS results (
     year SMALLINT NOT NULL,
     round SMALLINT NOT NULL,
     id_driver TEXT NOT NULL,
@@ -47,7 +51,7 @@ CREATE TABLE IF NOT EXISTS sessions.results (
     session TEXT NOT NULL,
     position TEXT NOT NULL,
     time INTERVAL NULL,
-    PRIMARY KEY (year, round, id_driver)
+    PRIMARY KEY (year, round, id_driver, session)
 );
 
 CREATE INDEX IF NOT EXISTS idx_ed_y
