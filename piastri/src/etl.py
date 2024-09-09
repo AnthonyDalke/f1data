@@ -11,9 +11,9 @@ from functions.functions import (
     get_df_denormalized,
     get_env_var,
     set_env_var,
+    setup_logger,
     write_df_postgres,
 )
-from functions.logging_config import setup_logger
 from .processing.data_quali import DataQuali
 from .processing.data_race import DataRace
 from .processing.data_event import DataEvent
@@ -227,7 +227,7 @@ def load_postgres(
         "df_events": {"table": "events", "primary_keys": ["year", "round"]},
         "df_drivers": {"table": "drivers", "primary_keys": ["id_driver"]},
         "df_teams": {"table": "teams", "primary_keys": ["name_team", "year"]},
-        "df_circuits": {"table": "circuits", "primary_keys": ["circuit_name"]},
+        "df_circuits": {"table": "circuits", "primary_keys": ["name_circuit"]},
         "df_results": {
             "table": "results",
             "primary_keys": ["year", "round", "id_driver", "session"],
@@ -237,6 +237,7 @@ def load_postgres(
     for df_name, df in dict_df.items():
         table_name = dict_db[df_name]["table"]
         primary_keys = dict_db[df_name]["primary_keys"]
+        logger.info(f"Loading {table_name} into Postgres.")
         write_df_postgres(
             db_user,
             db_password,
@@ -289,7 +290,9 @@ def main():
         event_missing,
     ) = extract_transform_history(list_years)
 
-    email_missing_data(session_missing, quali_missing, race_missing, event_missing, pw)
+    email_missing_data(
+        session_missing, quali_missing, race_missing, event_missing, pw, logger
+    )
 
     df_denormalized, df_events, df_drivers, df_teams, df_circuits, df_results = (
         extract_transform_tables(df_quali_all, df_race_all, df_event_all)
