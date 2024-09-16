@@ -49,9 +49,7 @@ def get_years(start: int, end: int) -> List[int]:
         List: A list of years.
     """
 
-    years = list(range(start, end + 1))
-
-    return years
+    return list(range(start, end + 1))
 
 
 def get_rounds(year: int) -> List[int]:
@@ -67,9 +65,7 @@ def get_rounds(year: int) -> List[int]:
 
     schedule = ff1.get_event_schedule(year)
     rounds_all = schedule.RoundNumber.to_list()
-    rounds_official = [r for r in rounds_all if r > 0]
-
-    return rounds_official
+    return [r for r in rounds_all if r > 0]
 
 
 def get_data_session(year: str, round: str, session: str) -> None:
@@ -91,262 +87,6 @@ def get_data_session(year: str, round: str, session: str) -> None:
     return session
 
 
-# def get_df_quali_raw(data_session: None) -> pd.DataFrame:
-#     """
-#     Retrieve qualifying session data from a DataFrame.
-
-#     Args:
-#         data_session (None): The raw qualifying session data.
-
-#     Returns:
-#         pd.DataFrame: A DataFrame containing the relevant columns from the qualifying data.
-#     """
-
-#     df = data_session.results[
-#         ["Q1", "Q2", "Q3", "DriverId", "LastName", "FirstName", "TeamName", "Position"]
-#     ]
-
-#     return df
-
-
-# def get_df_quali_processed(df_raw: pd.DataFrame, year: int, round: int) -> pd.DataFrame:
-#     """
-#     Process the raw qualifying data and return a processed DataFrame.
-
-#     Args:
-#         df_raw (pd.DataFrame): The raw DataFrame containing qualifying data.
-#         year (int): The year of the session.
-#         round (int): The round number of the session.
-
-#     Returns:
-#         pd.DataFrame: The processed DataFrame with the following columns:
-#             - id_driver: The driver ID.
-#             - name_driver_last: The last name of the driver.
-#             - name_driver_first: The first name of the driver.
-#             - name_team: The name of the team.
-#             - session: The qualifying session (Q1, Q2, or Q3).
-#             - time: The qualifying time.
-#             - position: The qualifying position of the driver in the session.
-#     """
-
-#     df = df_raw.melt(
-#         id_vars=["DriverId", "LastName", "FirstName", "TeamName", "Position"],
-#         value_vars=["Q1", "Q2", "Q3"],
-#         var_name="session",
-#         value_name="time",
-#     )
-
-#     df.columns = df.columns.str.lower()
-
-#     df["year"] = year
-#     df["round"] = round
-#     df["originalposition"] = df["position"]
-#     df["position"] = df.groupby("session")["time"].rank(method="min", ascending=True)
-#     df["position"] = df["position"].fillna(df["originalposition"])
-
-#     df = df.drop(columns=["originalposition"])
-
-#     df.rename(
-#         columns={
-#             "driverid": "id_driver",
-#             "lastname": "name_driver_last",
-#             "firstname": "name_driver_first",
-#             "teamname": "name_team",
-#         },
-#         inplace=True,
-#     )
-
-#     return df
-
-
-# def get_df_quali_final(df_processed: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Extracts the required columns from the processed DataFrame and returns a new DataFrame.
-
-#     Args:
-#         df_processed (pd.DataFrame): The processed DataFrame containing the F1 data.
-
-#     Returns:
-#         pd.DataFrame: A new DataFrame with the following columns:
-#             - id_driver: The ID of the driver.
-#             - name_driver_last: The last name of the driver.
-#             - name_driver_first: The first name of the driver.
-#             - name_team: The name of the team.
-#             - session: The session of the race.
-#             - position: The position of the driver in the race.
-#             - time: The time taken by the driver in the race.
-
-#     """
-
-#     df = df_processed[
-#         [
-#             "year",
-#             "round",
-#             "id_driver",
-#             "name_driver_last",
-#             "name_driver_first",
-#             "name_team",
-#             "session",
-#             "position",
-#             "time",
-#         ]
-#     ]
-
-#     return df
-
-
-# def get_df_race_raw(data_session: None) -> pd.DataFrame:
-#     """
-#     Retrieve race session data from a DataFrame.
-
-#     Args:
-#         data_session (None): The raw race session data.
-
-#     Returns:
-#         pd.DataFrame: A DataFrame containing the relevant columns from the race data.
-#     """
-
-#     df = data_session.results[
-#         [
-#             "DriverId",
-#             "LastName",
-#             "FirstName",
-#             "TeamName",
-#             "ClassifiedPosition",
-#             "Time",
-#         ]
-#     ]
-
-#     return df
-
-
-# def get_df_race_processed(df_raw: pd.DataFrame, year: int, round: int) -> pd.DataFrame:
-# """
-# Process the raw race data and return a processed DataFrame.
-
-# Args:
-#     df_raw (pd.DataFrame): The raw race data DataFrame.
-#     year (int): The year of the session.
-#     round (int): The round number of the session.
-
-# Returns:
-#     pd.DataFrame: The processed race data DataFrame.
-# """
-
-# df = df_raw.copy().reset_index(drop=True)
-
-# df["year"] = year
-# df["round"] = round
-# df["session"] = "Race"
-
-# df.columns = df.columns.str.lower()
-# df.rename(
-#     columns={
-#         "classifiedposition": "position",
-#         "driverid": "id_driver",
-#         "lastname": "name_driver_last",
-#         "firstname": "name_driver_first",
-#         "teamname": "name_team",
-#     },
-#     inplace=True,
-# )
-# df.loc[1:, "time"] = df.loc[1:, "time"] + df.loc[0, "time"]
-
-# return df
-
-
-# def get_df_race_final(df_processed: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Returns a DataFrame containing the final race data.
-
-#     Args:
-#         df_processed (pd.DataFrame): The processed DataFrame containing race data.
-
-#     Returns:
-#         pd.DataFrame: The DataFrame containing the final race data.
-#     """
-
-#     df = df_processed[
-#         [
-#             "year",
-#             "round",
-#             "id_driver",
-#             "name_driver_last",
-#             "name_driver_first",
-#             "name_team",
-#             "session",
-#             "position",
-#             "time",
-#         ]
-#     ]
-
-#     return df
-
-
-# def get_df_event_raw(data_session: None) -> pd.DataFrame:
-#     """
-#     Retrieve event session data for a given year and round.
-
-#     Args:
-#         data_session (None): Raw session data.
-
-#     Returns:
-#         pd.DataFrame: A DataFrame with the relevant columns from the event data.
-#     """
-
-#     df = data_session.event[
-#         ["RoundNumber", "Location", "EventDate", "Country"]
-#     ].to_frame()
-
-#     return df
-
-
-# def get_df_event_processed(df_raw: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Process the raw event data and return a processed DataFrame.
-
-#     Args:
-#         df_raw (pd.DataFrame): The raw event data DataFrame.
-
-#     Returns:
-#         pd.DataFrame: The processed event data DataFrame.
-#     """
-
-#     df = df_raw.T.reset_index(drop=True)
-
-#     df.columns = df.columns.str.lower()
-#     df.rename(
-#         columns={
-#             "roundnumber": "round",
-#             "location": "circuit_name",
-#             "country": "circuit_country",
-#         },
-#         inplace=True,
-#     )
-
-#     df["eventdate"] = pd.to_datetime(df["eventdate"])
-#     df["year"] = df["eventdate"].dt.year
-#     df["round"] = df["round"].astype(int)
-
-#     return df
-
-
-# def get_df_event_final(df_processed: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Returns a DataFrame containing the final event data.
-
-#     Args:
-#         df_processed (pd.DataFrame): The processed DataFrame containing event data.
-
-#     Returns:
-#         pd.DataFrame: The DataFrame containing the final event data.
-#     """
-
-#     df = df_processed[["year", "round", "circuit_name", "circuit_country"]]
-
-#     return df
-
-
 def get_df_sessions(df_quali: pd.DataFrame, df_race: pd.DataFrame) -> pd.DataFrame:
     """
     Concatenates the given qualifying and race DataFrames into a single DataFrame.
@@ -359,9 +99,7 @@ def get_df_sessions(df_quali: pd.DataFrame, df_race: pd.DataFrame) -> pd.DataFra
         pd.DataFrame: The concatenated DataFrame containing both qualifying and race data.
     """
 
-    df = pd.concat([df_quali, df_race], ignore_index=True)
-
-    return df
+    return pd.concat([df_quali, df_race], ignore_index=True)
 
 
 def get_df_denormalized(
@@ -378,103 +116,7 @@ def get_df_denormalized(
         pd.DataFrame: DataFrame containing denormalized data for sessions and event.
     """
 
-    df_denormalized = df_event.merge(df_sessions, on=["year", "round"], how="outer")
-
-    return df_denormalized
-
-
-# def get_df_events(df_event: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Get a DataFrame isolating normalized event data.
-
-#     Args:
-#         df_event (pd.DataFrame): The input DataFrame containing event data.
-
-#     Returns:
-#         pd.DataFrame: Normalized DataFrame with columns 'year', 'round', and 'circuit_name'.
-#     """
-
-#     df = df_event[["year", "round", "circuit_name"]].reset_index(drop=True)
-
-#     return df
-
-
-# def get_df_drivers(df_sessions: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Get a DataFrame isolating normalized driver data.
-
-#     Args:
-#         df_event (pd.DataFrame): The input DataFrame containing driver data.
-
-#     Returns:
-#         pd.DataFrame: Normalized DataFrame with columns.
-#             'id_driver', 'name_driver_last', and 'name_driver_first'.
-#     """
-
-#     df = (
-#         df_sessions[["id_driver", "name_driver_last", "name_driver_first"]]
-#         .drop_duplicates()
-#         .reset_index(drop=True)
-#     )
-
-#     return df
-
-
-# def get_df_teams(df_sessions: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Get a DataFrame isolating normalized team data.
-
-#     Args:
-#         df_event (pd.DataFrame): The input DataFrame containing team data.
-
-#     Returns:
-#         pd.DataFrame: Normalized DataFrame with columns.
-#             'name_team', 'year', and 'id_driver'.
-#     """
-
-#     df = (
-#         df_sessions[["name_team", "year", "id_driver"]]
-#         .drop_duplicates()
-#         .reset_index(drop=True)
-#     )
-
-#     return df
-
-
-# def get_df_circuits(df_event: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Get a DataFrame isolating normalized circuit data.
-
-#     Args:
-#         df_event (pd.DataFrame): The input DataFrame containing circuit data.
-
-#     Returns:
-#         pd.DataFrame: Normalized DataFrame with columns.
-#             'circuit_name' and 'circuit_country'.
-#     """
-
-#     df = df_event[["circuit_name", "circuit_country"]].reset_index(drop=True)
-
-#     return df
-
-
-# def get_df_results(df_sessions: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Get a DataFrame isolating normalized result data.
-
-#     Args:
-#         df_event (pd.DataFrame): The input DataFrame containing result data.
-
-#     Returns:
-#         pd.DataFrame: Normalized DataFrame with columns.
-#             'year', 'round', 'id_driver', 'name_team', 'session', 'position' and 'time'.
-#     """
-
-#     df = df_sessions[
-#         ["year", "round", "id_driver", "name_team", "session", "position", "time"]
-#     ].reset_index(drop=True)
-
-#     return df
+    return df_event.merge(df_sessions, on=["year", "round"], how="outer")
 
 
 def get_env_var(filename: str) -> None:
@@ -496,6 +138,31 @@ def get_env_var(filename: str) -> None:
 
 
 def set_env_var():
+    """
+    Retrieves and returns environment variables related to database configuration and other settings.
+
+    Environment Variables:
+        - POSTGRES_DB: Name of the PostgreSQL database.
+        - POSTGRES_USER: Username for the PostgreSQL database.
+        - POSTGRES_PASSWORD: Password for the PostgreSQL database.
+        - POSTGRES_HOST: Host address of the PostgreSQL database.
+        - POSTGRES_PORT: Port number of the PostgreSQL database.
+        - YEAR_START: Starting year for some process (converted to int).
+        - YEAR_END: Ending year for some process (converted to int).
+        - EMAIL_PW: Password for email.
+
+    Returns:
+        tuple: A tuple containing the following elements:
+            - db_name (str): Name of the PostgreSQL database.
+            - db_user (str): Username for the PostgreSQL database.
+            - db_password (str): Password for the PostgreSQL database.
+            - db_host (str): Host address of the PostgreSQL database.
+            - db_port (str): Port number of the PostgreSQL database.
+            - year_start (int): Starting year for some process.
+            - year_end (int): Ending year for some process.
+            - pw (str): Password for email.
+    """
+
     db_name = os.environ["POSTGRES_DB"]
     db_user = os.environ["POSTGRES_USER"]
     db_password = os.environ["POSTGRES_PASSWORD"]
