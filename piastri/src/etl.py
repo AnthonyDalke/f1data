@@ -1,6 +1,7 @@
-import pandas as pd
 import time
 from typing import List, Tuple
+
+import pandas as pd
 
 from functions.functions import (
     email_missing_data,
