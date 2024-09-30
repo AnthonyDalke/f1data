@@ -20,8 +20,6 @@ services:
 
   app:
     build: .
-    volumes:
-      - .:/app
     depends_on:
       db:
         condition: service_healthy
