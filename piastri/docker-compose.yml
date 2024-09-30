@@ -20,7 +20,6 @@ services:
 
   app:
     build: .
-    command: python -m src.etl
     volumes:
       - .:/app
     depends_on:

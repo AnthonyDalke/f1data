@@ -63,9 +63,6 @@ CREATE INDEX IF NOT EXISTS idx_ed_r
 CREATE INDEX IF NOT EXISTS idx_ed_d
     ON sessions.events_denormalized (id_driver);
 
-CREATE INDEX IF NOT EXISTS idx_ed_t
-    ON sessions.events_denormalized (name_team);
-
 CREATE INDEX IF NOT EXISTS idx_ed_s
     ON sessions.events_denormalized (session);
 
@@ -95,3 +92,6 @@ CREATE INDEX IF NOT EXISTS idx_r_r
 
 CREATE INDEX IF NOT EXISTS idx_r_i
     ON sessions.results (id_driver);
+
+CREATE INDEX IF NOT EXISTS idx_r_s
+    ON sessions.results (session);
