@@ -190,6 +190,7 @@ def load_postgres(
     df_teams: pd.DataFrame,
     df_circuits: pd.DataFrame,
     df_results: pd.DataFrame,
+    schema: str,
 ) -> None:
     """
     Loads the given DataFrames into corresponding tables in Postgres.
@@ -206,6 +207,7 @@ def load_postgres(
         df_teams (pd.DataFrame): The DataFrame containing team data.
         df_circuits (pd.DataFrame): The DataFrame containing circuit data.
         df_results (pd.DataFrame): The DataFrame containing result data.
+        schema (str): The schema for the target tables.
 
     Returns:
         None
@@ -227,7 +229,7 @@ def load_postgres(
         },
         "df_events": {"table": "events", "primary_keys": ["year", "round"]},
         "df_drivers": {"table": "drivers", "primary_keys": ["id_driver"]},
-        "df_teams": {"table": "teams", "primary_keys": ["name_team", "year"]},
+        "df_teams": {"table": "teams", "primary_keys": None},
         "df_circuits": {"table": "circuits", "primary_keys": ["name_circuit"]},
         "df_results": {
             "table": "results",
@@ -246,6 +248,7 @@ def load_postgres(
             db_host,
             db_port,
             df,
+            schema,
             table_name,
             primary_keys,
         )
@@ -275,9 +278,17 @@ def main():
 
     get_env_var(".env")
 
-    db_name, db_user, db_password, db_host, db_port, year_start, year_end, pw = (
-        set_env_var()
-    )
+    (
+        db_name,
+        db_user,
+        db_password,
+        db_host,
+        db_port,
+        year_start,
+        year_end,
+        schema,
+        pw,
+    ) = set_env_var()
 
     list_years = get_years(year_start, year_end)
 
@@ -311,6 +322,7 @@ def main():
         df_teams,
         df_circuits,
         df_results,
+        schema,
     )
 
 

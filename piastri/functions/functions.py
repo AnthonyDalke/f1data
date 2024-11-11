@@ -149,6 +149,7 @@ def set_env_var():
         - POSTGRES_PORT: Port number of the PostgreSQL database.
         - YEAR_START: Starting year for some process (converted to int).
         - YEAR_END: Ending year for some process (converted to int).
+        - SCHEMA_NAME: Name of the schema in the PostgreSQL database.
         - EMAIL_PW: Password for email.
 
     Returns:
@@ -160,6 +161,7 @@ def set_env_var():
             - db_port (str): Port number of the PostgreSQL database.
             - year_start (int): Starting year for some process.
             - year_end (int): Ending year for some process.
+            - schema (str): Name of the schema in the PostgreSQL database.
             - pw (str): Password for email.
     """
 
@@ -172,9 +174,21 @@ def set_env_var():
     year_start = int(os.environ["YEAR_START"])
     year_end = int(os.environ["YEAR_END"])
 
+    schema = os.environ["SCHEMA_NAME"]
+
     pw = os.environ["EMAIL_PW"]
 
-    return db_name, db_user, db_password, db_host, db_port, year_start, year_end, pw
+    return (
+        db_name,
+        db_user,
+        db_password,
+        db_host,
+        db_port,
+        year_start,
+        year_end,
+        schema,
+        pw,
+    )
 
 
 def write_df_postgres(
@@ -184,6 +198,7 @@ def write_df_postgres(
     host: str,
     port: str,
     df: pd.DataFrame,
+    schema: str,
     table: str,
     keys: List[str],
 ) -> None:
@@ -197,6 +212,7 @@ def write_df_postgres(
         host (str): The host address of the database.
         port (str): The port number of the database.
         df (pd.DataFrame): The DataFrame to be written to the database.
+        schema (str): The schema for the target table.
         table (str): The target table for the DataFrame.
         keys (List[str]): A list of primary key columns for the target table.
 
@@ -207,7 +223,7 @@ def write_df_postgres(
     engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/{database}")
 
     metadata = MetaData()
-    obj_table = Table(table, metadata, autoload_with=engine, schema="sessions")
+    obj_table = Table(table, metadata, autoload_with=engine, schema=schema)
 
     data = df.to_dict("records")
 

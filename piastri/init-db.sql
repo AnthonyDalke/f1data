@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS teams (
     name_team TEXT NOT NULL,
     year SMALLINT NOT NULL,
     id_driver TEXT NOT NULL,
-    PRIMARY KEY (name_team, year)
+    UNIQUE (name_team, year, id_driver)
 );
 
 CREATE TABLE IF NOT EXISTS circuits (
