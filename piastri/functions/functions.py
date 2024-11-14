@@ -99,7 +99,10 @@ def get_df_sessions(df_quali: pd.DataFrame, df_race: pd.DataFrame) -> pd.DataFra
         pd.DataFrame: The concatenated DataFrame containing both qualifying and race data.
     """
 
-    return pd.concat([df_quali, df_race], ignore_index=True)
+    df_sessions = pd.concat([df_quali, df_race], ignore_index=True)
+    df_sessions = df_sessions.dropna(subset=["id_driver"])
+
+    return df_sessions
 
 
 def get_df_denormalized(
