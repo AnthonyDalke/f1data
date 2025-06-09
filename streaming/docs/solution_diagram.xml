@@ -1,73 +1,83 @@
-<mxfile host="app.diagrams.net">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15" version="27.1.4">
   <diagram name="F1 Analytics Free-Tier Pipeline" id="F1AnalyticsPipeline">
-    <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+    <mxGraphModel dx="976" dy="670" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="1200" math="0" shadow="0">
       <root>
-        <mxCell id="0"/>
-        <mxCell id="1" parent="0"/>
-        <!-- FastF1 API -->
-        <mxCell id="2" value="FastF1 API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="40" y="120" width="120" height="50" as="geometry"/>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="100" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#039be5;strokeWidth=2;opacity=40;align=left;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="10" y="40" width="880" height="490" as="geometry" />
         </mxCell>
-        <!-- Python Ingestion Script (Airflow) -->
-        <mxCell id="3" value="Python Ingestion Script&#10;(Airflow PythonOperator)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="200" y="120" width="180" height="50" as="geometry"/>
+        <mxCell id="2" value="&lt;b&gt;FastF1 API&lt;/b&gt;" style="shape=parallelogram;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="60" y="80" width="120" height="60" as="geometry" />
         </mxCell>
-        <!-- Kafka (Confluent Cloud Free Tier) -->
-        <mxCell id="4" value="Kafka&#10;(Confluent Cloud Free Tier)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="420" y="120" width="180" height="50" as="geometry"/>
+        <mxCell id="3" value="&lt;b&gt;Python Ingestion Script&lt;/b&gt;&lt;br&gt;(Airflow Python Operator)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="220" y="80" width="140" height="60" as="geometry" />
         </mxCell>
-        <!-- Spark Streaming -->
-        <mxCell id="5" value="Spark Streaming&#10;(Databricks CE or local PySpark)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="640" y="120" width="200" height="50" as="geometry"/>
+        <mxCell id="4" value="&lt;b&gt;Kafka&lt;/b&gt;&lt;br&gt;(Confluent Cloud Free Tier)" style="shape=mxgraph.aws4.queue;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="400" y="80" width="170" height="60" as="geometry" />
         </mxCell>
-        <!-- Raw Data Sink (S3/GCS) -->
-        <mxCell id="6" value="Raw Data Sink&#10;(S3/GCS, raw bucket/prefix)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
-          <mxGeometry x="880" y="120" width="180" height="50" as="geometry"/>
+        <mxCell id="5" value="&lt;b&gt;Spark Streaming&lt;/b&gt;&lt;br&gt;(Databricks CE or local PySpark)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="630" y="80" width="200" height="60" as="geometry" />
         </mxCell>
-        <!-- dbt Cloud (Free Tier) or local dbt -->
-        <mxCell id="7" value="dbt Cloud (Free Tier)&#10;or local dbt&#10;(pulls from Raw Data Sink, transforms)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
-          <mxGeometry x="1120" y="120" width="200" height="60" as="geometry"/>
+        <mxCell id="U0zF-Eq2lUKb2HJoAJub-101" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" edge="1" parent="1" source="6" target="7">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <!-- Transformed Data Sink (S3/GCS) -->
-        <mxCell id="8" value="Transformed Data Sink&#10;(S3/GCS, transformed bucket/prefix)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
-          <mxGeometry x="1360" y="120" width="200" height="50" as="geometry"/>
+        <mxCell id="6" value="&lt;b&gt;Raw Data Sink&lt;/b&gt;&lt;br&gt;(S3/GCS, raw bucket/prefix)" style="shape=cylinder;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="642.5" y="190" width="175" height="60" as="geometry" />
         </mxCell>
-        <!-- Snowflake or DuckDB/BigQuery Sandbox -->
-        <mxCell id="9" value="Snowflake (Trial)&#10;or DuckDB/BigQuery Sandbox" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="1620" y="120" width="180" height="50" as="geometry"/>
+        <mxCell id="U0zF-Eq2lUKb2HJoAJub-102" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" edge="1" parent="1" source="7" target="8">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <!-- Tableau Public -->
-        <mxCell id="10" value="Tableau Public&#10;(Dashboards)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="1840" y="120" width="140" height="50" as="geometry"/>
+        <mxCell id="7" value="&lt;b&gt;Great Expectations&lt;br&gt;Data Quality Checks&lt;/b&gt;&lt;br&gt;(Raw)" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="390" y="182.5" width="210" height="75" as="geometry" />
         </mxCell>
-        <!-- Arrows -->
-        <mxCell id="11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="2" target="3">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="8" value="&lt;b&gt;dbt Cloud (Free Tier)&lt;br&gt;or local dbt&lt;/b&gt;&lt;br&gt;(pull from Raw Data Sink &amp;amp; transform)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="100" y="190" width="240" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="3" target="4">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="9" value="&lt;b&gt;Transformed Data Sink&lt;/b&gt;&lt;br&gt;(S3/GCS, transformed bucket/prefix)" style="shape=cylinder;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="115" y="320" width="210" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="4" target="5">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="U0zF-Eq2lUKb2HJoAJub-103" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" edge="1" parent="1" source="10" target="11">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="5" target="6">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="10" value="&lt;b&gt;Great Expectations&lt;br&gt;Data Quality Checks&lt;/b&gt;&lt;br&gt;(Transformed)" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="395" y="310" width="200" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="6" target="7">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="U0zF-Eq2lUKb2HJoAJub-105" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" edge="1" parent="1" source="11" target="12">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="7" target="8">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="11" value="&lt;b&gt;Snowflake (Trial),&amp;nbsp;DuckDB, or BigQuery Sandbox&lt;/b&gt;" style="shape=cylinder;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="645" y="320" width="170" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="8" target="9">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="12" value="&lt;b&gt;Tableau Public&lt;/b&gt;&lt;br&gt;(Dashboards)" style="shape=mxgraph.cisco.computing.monitor;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" vertex="1">
+          <mxGeometry x="435" y="430" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="9" target="10">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="13" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" source="2" target="3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="120" as="sourcePoint" />
+          </mxGeometry>
         </mxCell>
-        <!-- Orchestration/Monitoring Note -->
-        <mxCell id="19" value="Orchestration: Airflow (Astronomer Free Tier or local Docker)&#10;Monitoring: Logging/alerts in Airflow and scripts&#10;Data Quality: Great Expectations (optional, local/free tier)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeDasharray=3 3;" vertex="1" parent="1">
-          <mxGeometry x="420" y="200" width="900" height="60" as="geometry"/>
+        <mxCell id="15" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" target="5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="580" y="110" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" source="5" target="6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" source="8" target="9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" parent="1" source="9" target="10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="U0zF-Eq2lUKb2HJoAJub-100" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" edge="1" parent="1" source="3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="111" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="U0zF-Eq2lUKb2HJoAJub-111" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=Architects+Daughter&quot; face=&quot;Architects Daughter&quot;&gt;&lt;b&gt;Orchestration&lt;/b&gt; (Airflow) &lt;b&gt;Monitoring&lt;/b&gt; (Logging &amp;amp; Alerts)&lt;/font&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="60" y="440" width="200" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
