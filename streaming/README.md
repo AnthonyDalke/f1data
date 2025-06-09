@@ -21,6 +21,10 @@ This repository contains the following files and directories:
 - `docs`: Directory for reference and EDA materials such as Jupyter notebooks
 - `requirements.txt`: File specifying Python dependencies
 
+## Solution Architecture
+
+![F1 Data Pipeline Architecture](docs/solution_diagram.png)
+
 ## Installation
 
 1. Clone the repository:
