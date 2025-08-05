@@ -4,6 +4,7 @@ import os
 os.environ["JAVA_HOME"] = "/opt/homebrew/opt/openjdk@17"
 os.environ["PATH"] = "/opt/homebrew/opt/openjdk@17/bin:" + os.environ["PATH"]
 
+
 # Import necessary libraries
 import time
 from datetime import datetime
@@ -17,6 +18,7 @@ pd.set_option("display.max_columns", None)
 import psutil
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import count
+
 
 # Clear Python's module cache to install fastf1
 import sys
@@ -68,6 +70,7 @@ for driver in session_object.drivers:
     except Exception as e:
         print(f"Error while loading data for driver {driver}: {e}")
 
+
 # Concatenate all driver telemetry into a single dataframe
 try:
     combined_telemetry = pd.concat(telemetry_data, ignore_index=True)
@@ -75,3 +78,19 @@ try:
     print(f"Preview of combined telemetry data: {combined_telemetry.head()}")
 except Exception as e:
     print(f"Error while concatenating driver telemetry data: {e}.")
+
+
+# Generate histograms to assess for skew
+combined_telemetry.hist(figsize=(12, 8))
+plt.tight_layout()
+plt.show()
+
+combined_telemetry["Driver"].value_counts().plot(
+    kind="bar", figsize=(10, 4), title="Driver Distribution"
+)
+plt.ylabel("Count")
+plt.show()
+
+
+def create_spark_session(config_setting: str) -> SparkSession:
+    return SparkSession.builder.appName(config_setting)
