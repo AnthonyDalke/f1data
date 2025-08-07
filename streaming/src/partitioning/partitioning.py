@@ -8,6 +8,7 @@ os.environ["PATH"] = "/opt/homebrew/opt/openjdk@17/bin:" + os.environ["PATH"]
 # Import necessary libraries
 import time
 from datetime import datetime
+from typing import Dict
 
 import numpy as np
 import matplotlib
@@ -27,6 +28,8 @@ if "typing_extensions" in sys.modules:
     del sys.modules["typing_extensions"]
 
 import fastf1 as ff1
+
+from .spark_config import config, test
 
 
 def time_process(time_start: float, time_end: float, name_process: str) -> None:
@@ -92,5 +95,17 @@ plt.ylabel("Count")
 plt.show()
 
 
-def create_spark_session(config_setting: str) -> SparkSession:
-    return SparkSession.builder.appName(config_setting)
+test_setting: str = input(
+    "Enter one of the following case-sensitive Spark configuration settings to test: 'master', 'repartitioning', 'driver.memory', 'shuffle.partitions', or 'serializer': "
+)
+
+
+def create_spark_session(
+    config_setting: Dict[str, str], test_setting: str
+) -> SparkSession:
+    spark_config: str = config_setting[test_setting]
+
+    session_str: str = f"""
+    SparkSession.builder.appName({config_setting}) \
+    .{spark_config} \
+    """

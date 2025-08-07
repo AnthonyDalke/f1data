@@ -1,7 +1,0 @@
-{
-    "master": {},
-    "repartitioning": {},
-    "driver.memory": {},
-    "shuffle.partitions": {},
-    "serializer": {}
-}
