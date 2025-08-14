@@ -1,4 +1,4 @@
-config = {
+setting_config = {
     "master": {
         "spark.driver.memory": "6g",
         "spark.sql.shuffle.partitions": "6",
@@ -31,7 +31,7 @@ config = {
     },
 }
 
-test = {
+function_setting = {
     "master": {"local": {variable}},
     "driver.memory": {
         "spark.driver.memory": {variable},

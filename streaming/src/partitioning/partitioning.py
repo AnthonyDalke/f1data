@@ -17,17 +17,9 @@ import pandas as pd
 
 pd.set_option("display.max_columns", None)
 import psutil
+import fastf1 as ff1
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import count
-
-
-# Clear Python's module cache to install fastf1
-import sys
-
-if "typing_extensions" in sys.modules:
-    del sys.modules["typing_extensions"]
-
-import fastf1 as ff1
 
 from .spark_config import config, test
 
@@ -38,7 +30,6 @@ def time_process(time_start: float, time_end: float, name_process: str) -> None:
 
 
 # Load data for single session
-
 session_year: int = int(input("Enter the year of the session to load (e.g., 2025): "))
 session_location: str = input(
     "Enter the location of the session to load (e.g., 'Monaco'): "

@@ -1,3 +1,4 @@
 *.crc
 *.parquet
 *_SUCCESS
+.vscode/settings.json
