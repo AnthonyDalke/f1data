@@ -21,7 +21,7 @@ import fastf1 as ff1
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import count
 
-from .spark_config import config, test
+from .spark_config import setting_others, setting_test
 
 
 def time_process(time_start: float, time_end: float, name_process: str) -> None:
@@ -91,12 +91,51 @@ test_setting: str = input(
 )
 
 
-def create_spark_session(
-    config_setting: Dict[str, str], test_setting: str
-) -> SparkSession:
-    spark_config: str = config_setting[test_setting]
+def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
+    config_base: str = setting_others[test_setting]
+
+    config_test: str = setting_test[test_value]
 
     session_str: str = f"""
     SparkSession.builder.appName({config_setting}) \
     .{spark_config} \
     """
+
+
+def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
+    """
+    Create a Spark session with dynamic configuration based on test parameters.
+
+    Args:
+        test_setting: Configuration setting to test ('master', 'driver.memory', etc.)
+        test_value: Value to use for the test setting
+
+    Returns:
+        Configured SparkSession
+    """
+    # Get base configuration
+    config = base_configs[test_setting].copy()
+
+    # Handle serializer special case
+    if test_setting == "serializer":
+        if test_value.lower() == "kryo":
+            config["spark.serializer"] = "org.apache.spark.serializer.KryoSerializer"
+            config["spark.kryo.registrationRequired"] = "true"
+        else:
+            config["spark.serializer"] = "org.apache.spark.serializer.JavaSerializer"
+            config["spark.kryo.registrationRequired"] = "false"
+    else:
+        # For all other settings, directly use the test value
+        config[config_keys[test_setting]] = test_value
+
+    # Create the Spark session
+    builder = SparkSession.builder.appName(f"partitioning_{test_setting}_{test_value}")
+
+    # Apply configurations
+    for key, value in config.items():
+        if key == "master":
+            builder = builder.master(value)
+        else:
+            builder = builder.config(key, value)
+
+    return builder.getOrCreate()

@@ -1,9 +1,10 @@
-setting_config = {
+config_base: dict[str, dict[str, str]] = {
     "master": {
         "spark.driver.memory": "6g",
         "spark.sql.shuffle.partitions": "6",
         "spark.serializer": "org.apache.spark.serializer.JavaSerializer",
-        "spark.ui.port": "4040",},
+        "spark.ui.port": "4040",
+    },
     "repartitioning": {
         "local": "[6]",
         "spark.driver.memory": "6g",
@@ -31,17 +32,9 @@ setting_config = {
     },
 }
 
-function_setting = {
-    "master": {"local": {variable}},
-    "driver.memory": {
-        "spark.driver.memory": {variable},
-    },
-    "shuffle.partitions": {"spark.sql.shuffle.partitions": str(variable),
-    "serializer": {
-        "spark.serializer": f"""
-        'org.apache.spark.serializer.KryoSerializer'
-        if {variable} == 'kryo'
-        else 'org.apache.spark.serializer.JavaSerializer'
-        """
-    },
+config_keys: dict[str, str] = {
+    "master": "master",
+    "driver.memory": "spark.driver.memory",
+    "shuffle.partitions": "spark.sql.shuffle.partitions",
+    "serializer": "spark.serializer",
 }
