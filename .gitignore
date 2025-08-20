@@ -2,3 +2,4 @@
 *.parquet
 *_SUCCESS
 .vscode/settings.json
+*.pyc
