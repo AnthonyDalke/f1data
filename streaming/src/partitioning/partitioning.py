@@ -1,78 +1,22 @@
-# Set up environment variables for Java, required by PySpark
 import os
+import time
 
+import fastf1 as ff1
+import matplotlib.pyplot as plt
+import pandas as pd
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import count
+
+from functions import create_spark_session, time_process
+from ProcessMonitor import ProcessMonitor
+from spark_config import config_base
+
+# Set up environment variables for Java, required by PySpark
 os.environ["JAVA_HOME"] = "/opt/homebrew/opt/openjdk@17"
 os.environ["PATH"] = "/opt/homebrew/opt/openjdk@17/bin:" + os.environ["PATH"]
 
-
-# Import necessary libraries
-import time
-from datetime import datetime
-from typing import Dict
-
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import pandas as pd
-
+# Configure pandas to display all DataFrame columns
 pd.set_option("display.max_columns", None)
-import psutil
-import fastf1 as ff1
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import count
-
-from spark_config import config_base, config_keys
-
-
-def time_process(time_start: float, time_end: float, name_process: str) -> None:
-    duration = time_end - time_start
-    print(f"Duration of {name_process} process: {duration} seconds")
-
-
-def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
-    """
-    Create a Spark session with dynamic configuration based on test parameters.
-
-    Args:
-        test_setting: Configuration setting to test. Must enter of the following:
-            'master', 'repartitioning', 'driver.memory', 'shuffle.partitions', or 'serializer'.
-        test_value: Value to use for the configuration setting to test.
-
-    Returns:
-        Configured SparkSession
-    """
-
-    # Begin with base of Spark Session configuration
-    spark_config = config_base[test_setting].copy()
-
-    # Assemble rest of Spark Session configuration based on test parameters
-    if test_setting == "serializer":
-        if test_value.lower() == "kyro":
-            spark_config["spark.serializer"] = (
-                "org.apache.spark.serializer.KyroSerializer"
-            )
-            spark_config["spark.kyro.registrationRequired"] = "true"
-        else:
-            spark_config["spark.serializer"] = (
-                "org.apache.spark.serializer.JavaSerializer"
-            )
-            spark_config["spark.kyro.registrationRequired"] = "false"
-    else:
-        spark_config[config_keys[test_setting]] = test_value
-
-    # Define the Spark Session
-    spark_builder = SparkSession.builder.appName(
-        f"partitioning_{test_setting}_{test_value}"
-    )
-
-    # Add Spark Sesssion configuration details to builder
-    for key, value in spark_config.items():
-        if key == "master":
-            spark_builder = spark_builder.master(value)
-        else:
-            spark_builder = spark_builder.config(key, value)
-
-    return spark_builder.getOrCreate()
 
 
 def main():
@@ -152,6 +96,24 @@ def main():
     )
 
     spark_session = create_spark_session(test_setting, test_value)
+    df_base: DataFrame = spark_session.createDataFrame(combined_telemetry)
+
+    time_start: float = time.time()
+
+    process_monitor = ProcessMonitor()
+    process_monitor.start()
+
+    df_repartitioned: DataFrame = df_base.repartition(6, "SessionTime").persist()
+    df_agg: DataFrame = df_repartitioned.groupBy("Driver").agg(
+        count("Speed").alias("SpeedCount")
+    )
+    df_agg.write.mode("overwrite").parquet(f"{test_setting}_{test_value}")
+
+    process_monitor.stop()
+
+    time_end: float = time.time()
+    time_process(time_start, time_end, test_setting)
+
     input(f"Press Enter to stop Spark session...")
     spark_session.stop()
 
