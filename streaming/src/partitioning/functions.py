@@ -14,7 +14,7 @@ def time_process(time_start: float, time_end: float, name_process: str) -> None:
     """
 
     duration = time_end - time_start
-    print(f"Duration of {name_process} process: {duration} seconds")
+    print(f"Duration of {name_process} process: {duration:.2f} seconds")
 
 
 def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
@@ -22,7 +22,7 @@ def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
     Create a Spark session with dynamic configuration based on test parameters.
 
     Args:
-        test_setting: Configuration setting to test. Must enter of the following:
+        test_setting: Configuration setting to test. Must enter one of the following:
             'master', 'repartitioning', 'driver.memory', 'shuffle.partitions', or 'serializer'.
         test_value: Value to use for the configuration setting to test.
 
@@ -35,16 +35,13 @@ def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
 
     # Assemble rest of Spark Session configuration based on test parameters
     if test_setting == "serializer":
-        if test_value.lower() == "kyro":
-            spark_config["spark.serializer"] = (
-                "org.apache.spark.serializer.KyroSerializer"
-            )
-            spark_config["spark.kyro.registrationRequired"] = "true"
-        else:
-            spark_config["spark.serializer"] = (
-                "org.apache.spark.serializer.JavaSerializer"
-            )
-            spark_config["spark.kyro.registrationRequired"] = "false"
+        is_kryo = test_value.lower() == "kryo"
+        spark_config["spark.serializer"] = (
+            "org.apache.spark.serializer.KryoSerializer"
+            if is_kryo
+            else "org.apache.spark.serializer.JavaSerializer"
+        )
+        spark_config["spark.kryo.registrationRequired"] = str(is_kryo).lower()
     else:
         spark_config[config_keys[test_setting]] = test_value
 
@@ -53,7 +50,7 @@ def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
         f"partitioning_{test_setting}_{test_value}"
     )
 
-    # Add Spark Sesssion configuration details to builder
+    # Add Spark Session configuration details to builder
     for key, value in spark_config.items():
         if key == "master":
             spark_builder = spark_builder.master(value)
