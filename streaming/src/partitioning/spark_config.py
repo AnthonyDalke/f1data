@@ -33,7 +33,7 @@ config_base: dict[str, dict[str, str]] = {
 }
 
 config_keys: dict[str, str] = {
-    "master": "master",
+    "master": "local",
     "driver.memory": "spark.driver.memory",
     "shuffle.partitions": "spark.sql.shuffle.partitions",
     "serializer": "spark.serializer",

@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame, SparkSession
 
 from spark_config import config_base, config_keys
 
@@ -52,9 +52,21 @@ def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
 
     # Add Spark Session configuration details to builder
     for key, value in spark_config.items():
-        if key == "master":
-            spark_builder = spark_builder.master(value)
-        else:
-            spark_builder = spark_builder.config(key, value)
+        spark_builder = spark_builder.config(key, value)
 
     return spark_builder.getOrCreate()
+
+
+def get_partition_stats(df: DataFrame, sequencing: str) -> None:
+    """
+    Display partition statistics for a given DataFrame.
+
+    Args:
+        df: The DataFrame to analyze.
+        sequencing: Indication of whether stats come from before or after repartitioning.
+    """
+
+    print(f"Count of partitions {sequencing} partitioning: {df.rdd.getNumPartitions()}")
+    print(
+        f"Partition sizes (rows) {sequencing} partitioning: {df.rdd.glom().map(len).collect()}"
+    )

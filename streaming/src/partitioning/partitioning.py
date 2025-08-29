@@ -66,17 +66,6 @@ def main():
         print(f"Error while concatenating driver telemetry data: {e}.")
         combined_telemetry = pd.DataFrame()
 
-    # Generate histograms to assess for skew
-    combined_telemetry.hist(figsize=(12, 8))
-    plt.tight_layout()
-    plt.show()
-
-    combined_telemetry["Driver"].value_counts().plot(
-        kind="bar", figsize=(10, 4), title="Driver Distribution"
-    )
-    plt.ylabel("Count")
-    plt.show()
-
     while True:
         test_setting: str = input(
             "Enter one of the following case-sensitive Spark Session configuration settings to test: 'master', 'repartitioning', 'driver.memory', 'shuffle.partitions', or 'serializer': "
@@ -88,12 +77,24 @@ def main():
         )
     test_value: str = str(
         input(
-            f"Enter the value to test with the {test_setting} Spark Session configuration setting."
+            f"Enter the value to test with the {test_setting} Spark Session configuration setting: "
         )
     )
     print(
         f"Testing Spark Session configuration setting {test_setting} with a value of {test_value}."
     )
+
+    if test_setting == "repartitioning":
+        # Generate histograms to assess for skew
+        combined_telemetry.hist(figsize=(12, 8))
+        plt.tight_layout()
+        plt.show()
+
+        combined_telemetry["Driver"].value_counts().plot(
+            kind="bar", figsize=(10, 4), title="Driver Distribution"
+        )
+        plt.ylabel("Count")
+        plt.show()
 
     spark_session = create_spark_session(test_setting, test_value)
     df_base: DataFrame = spark_session.createDataFrame(combined_telemetry)
