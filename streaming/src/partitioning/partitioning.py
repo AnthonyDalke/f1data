@@ -7,7 +7,7 @@ import pandas as pd
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import count
 
-from functions import create_spark_session, time_process
+from functions import create_spark_session, get_partition_stats, time_process
 from ProcessMonitor import ProcessMonitor
 from spark_config import config_base
 
@@ -104,7 +104,11 @@ def main():
     process_monitor = ProcessMonitor()
     process_monitor.start()
 
+    get_partition_stats(df_base, "before")
+
     df_repartitioned: DataFrame = df_base.repartition(6, "SessionTime").persist()
+    get_partition_stats(df_repartitioned, "after")
+
     df_agg: DataFrame = df_repartitioned.groupBy("Driver").agg(
         count("Speed").alias("SpeedCount")
     )
