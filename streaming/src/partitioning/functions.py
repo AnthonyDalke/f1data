@@ -52,7 +52,10 @@ def create_spark_session(test_setting: str, test_value: str) -> SparkSession:
 
     # Add Spark Session configuration details to builder
     for key, value in spark_config.items():
-        spark_builder = spark_builder.config(key, value)
+        if key == "master":
+            spark_builder = spark_builder.master(f"local[{value}]")
+        else:
+            spark_builder = spark_builder.config(key, value)
 
     return spark_builder.getOrCreate()
 
