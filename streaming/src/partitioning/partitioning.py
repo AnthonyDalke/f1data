@@ -27,44 +27,45 @@ def main():
     session_location: str = input(
         "Enter the location of the session to load (e.g., 'Monaco'): "
     )
-    session_name: str = input(
-        "Enter the abbrevation of the session name to load (e.g., 'Q' or 'R'): "
-    )
 
     load_start: float = time.time()
 
-    session_object = ff1.get_session(session_year, session_location, session_name)
-    session_object.load()
-
-    load_end: float = time.time()
-    time_process(load_start, load_end, "session data load")
-
-    # Fetch telemetry data for all drivers from session
-    print(
-        f"Fetching telemetry data for full driver list: {len(session_object.drivers)}"
-    )
-
     telemetry_data = []
-    for driver in session_object.drivers:
+
+    for session in ["FP1", "FP2", "FP3", "Q", "R"]:
         try:
-            driver_data = session_object.laps.pick_drivers(driver).get_telemetry()
-            if not driver_data.empty:
-                driver_data["Driver"] = driver
-                driver_data["SessionKey"] = (
-                    f"{session_object.event.EventName} {session_object.name}"
-                )
-                telemetry_data.append(driver_data)
+            session_object = ff1.get_session(session_year, session_location, session)
+            session_object.load()
+
+            # Fetch telemetry data for all drivers from session
+            print(f"Fetching telemetry data for {len(session_object.drivers)} drivers.")
+
+            for driver in session_object.drivers:
+                try:
+                    driver_data = session_object.laps.pick_drivers(
+                        driver
+                    ).get_telemetry()
+                    if not driver_data.empty:
+                        driver_data["Driver"] = driver
+                        driver_data["SessionKey"] = (
+                            f"{session_object.event.EventName} {session_object.name}"
+                        )
+                        telemetry_data.append(driver_data)
+                except Exception as e:
+                    print(f"Error while loading data for driver {driver}: {e}")
         except Exception as e:
-            print(f"Error while loading data for driver {driver}: {e}")
+            print(f"Error while loading session {session}: {e}")
 
     # Concatenate all driver telemetry into a single dataframe
     try:
         combined_telemetry = pd.concat(telemetry_data, ignore_index=True)
         print(f"Records in combined telemetry data: {len(combined_telemetry)}")
-        print(f"Preview of combined telemetry data: {combined_telemetry.head()}")
     except Exception as e:
         print(f"Error while concatenating driver telemetry data: {e}.")
         combined_telemetry = pd.DataFrame()
+
+    load_end: float = time.time()
+    time_process(load_start, load_end, "session data load")
 
     while True:
         test_setting: str = input(
