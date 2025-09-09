@@ -126,7 +126,9 @@ def main():
         input(f"Press Enter to stop Spark session...")
         spark_session.stop()
 
-    stop_command = str.lower(input(f"Enter 'stop' to end the program: "))
+        stop_command = str.lower(
+            input(f"Enter 'stop' to end the program or anything else to continue: ")
+        )
 
 
 if __name__ == "__main__":
