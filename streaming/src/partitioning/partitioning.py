@@ -67,61 +67,66 @@ def main():
     load_end: float = time.time()
     time_process(load_start, load_end, "session data load")
 
-    while True:
-        test_setting: str = input(
-            "Enter one of the following case-sensitive Spark Session configuration settings to test: 'master', 'repartitioning', 'driver.memory', 'shuffle.partitions', or 'serializer': "
+    stop_command: str | None = None
+
+    while stop_command != "stop":
+        while True:
+            test_setting: str = input(
+                "Enter one of the following case-sensitive Spark Session configuration settings to test: 'master', 'repartitioning', 'driver.memory', 'shuffle.partitions', or 'serializer': "
+            )
+            if test_setting in config_base:
+                break
+            print(
+                f"Invalid Spark Session configuration setting entered. Enter one of the following case-sensitive Spark Session configuration settings to test: 'master', 'repartitioning', 'driver.memory', 'shuffle.partitions', or 'serializer': "
+            )
+        test_value: str = str(
+            input(
+                f"Enter the value to test with the {test_setting} Spark Session configuration setting: "
+            )
         )
-        if test_setting in config_base:
-            break
         print(
-            f"Invalid Spark Session configuration setting entered. Enter one of the following case-sensitive Spark Session configuration settings to test: 'master', 'repartitioning', 'driver.memory', 'shuffle.partitions', or 'serializer': "
+            f"Testing Spark Session configuration setting {test_setting} with a value of {test_value}."
         )
-    test_value: str = str(
-        input(
-            f"Enter the value to test with the {test_setting} Spark Session configuration setting: "
+
+        if test_setting == "repartitioning":
+            # Generate histograms to assess for skew
+            combined_telemetry.hist(figsize=(12, 8))
+            plt.tight_layout()
+            plt.show()
+
+            combined_telemetry["Driver"].value_counts().plot(
+                kind="bar", figsize=(10, 4), title="Driver Distribution"
+            )
+            plt.ylabel("Count")
+            plt.show()
+
+        spark_session = create_spark_session(test_setting, test_value)
+        df_base: DataFrame = spark_session.createDataFrame(combined_telemetry)
+
+        time_start: float = time.time()
+
+        process_monitor = ProcessMonitor()
+        process_monitor.start()
+
+        get_partition_stats(df_base, "before")
+
+        df_repartitioned: DataFrame = df_base.repartition(6, "SessionTime").persist()
+        get_partition_stats(df_repartitioned, "after")
+
+        df_agg: DataFrame = df_repartitioned.groupBy("Driver").agg(
+            count("Speed").alias("SpeedCount")
         )
-    )
-    print(
-        f"Testing Spark Session configuration setting {test_setting} with a value of {test_value}."
-    )
+        df_agg.write.mode("overwrite").parquet(f"{test_setting}_{test_value}")
 
-    if test_setting == "repartitioning":
-        # Generate histograms to assess for skew
-        combined_telemetry.hist(figsize=(12, 8))
-        plt.tight_layout()
-        plt.show()
+        process_monitor.stop()
 
-        combined_telemetry["Driver"].value_counts().plot(
-            kind="bar", figsize=(10, 4), title="Driver Distribution"
-        )
-        plt.ylabel("Count")
-        plt.show()
+        time_end: float = time.time()
+        time_process(time_start, time_end, test_setting)
 
-    spark_session = create_spark_session(test_setting, test_value)
-    df_base: DataFrame = spark_session.createDataFrame(combined_telemetry)
+        input(f"Press Enter to stop Spark session...")
+        spark_session.stop()
 
-    time_start: float = time.time()
-
-    process_monitor = ProcessMonitor()
-    process_monitor.start()
-
-    get_partition_stats(df_base, "before")
-
-    df_repartitioned: DataFrame = df_base.repartition(6, "SessionTime").persist()
-    get_partition_stats(df_repartitioned, "after")
-
-    df_agg: DataFrame = df_repartitioned.groupBy("Driver").agg(
-        count("Speed").alias("SpeedCount")
-    )
-    df_agg.write.mode("overwrite").parquet(f"{test_setting}_{test_value}")
-
-    process_monitor.stop()
-
-    time_end: float = time.time()
-    time_process(time_start, time_end, test_setting)
-
-    input(f"Press Enter to stop Spark session...")
-    spark_session.stop()
+    stop_command = str.lower(input(f"Enter 'stop' to end the program: "))
 
 
 if __name__ == "__main__":
