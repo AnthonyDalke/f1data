@@ -1,3 +1,7 @@
+import matplotlib.figure as fig
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from pyspark.sql import DataFrame, SparkSession
 
 from spark_config import config_base, config_keys
@@ -73,3 +77,51 @@ def get_partition_stats(df: DataFrame, sequencing: str) -> None:
     print(
         f"Partition sizes (rows) {sequencing} partitioning: {df.rdd.glom().map(len).collect()}"
     )
+
+
+def plot_distributions(df: pd.DataFrame) -> fig.Figure:
+    """
+    Create simple distribution plots for each column in the dataframe.
+    Handles numeric, categorical, boolean and datetime data types.
+    """
+
+    n_plots = len(df.columns)
+    n_cols = 3
+    n_rows = (n_plots + n_cols - 1) // n_cols
+
+    fig = plt.figure(figsize=(15, 4 * n_rows))
+
+    for idx, col in enumerate(df.columns, 1):
+        ax = plt.subplot(n_rows, n_cols, idx)
+        dtype = df[col].dtype
+
+        if dtype in ["float64", "int64"]:
+            df[col].hist(bins=15, edgecolor="white", linewidth=0.5, ax=ax)
+        elif dtype == "bool":
+            df[col].value_counts().plot(kind="bar", ax=ax)
+        elif dtype == "object":
+            df[col].value_counts().head(10).plot(kind="bar", ax=ax)
+        elif dtype == "datetime64[ns]":
+            df[col].astype(np.int64).hist(
+                bins=15, edgecolor="white", linewidth=0.5, ax=ax
+            )
+            plt.xlabel("Date", fontsize=9)
+        elif dtype == "timedelta64[ns]":
+            df[col].dt.total_seconds().hist(
+                bins=15, edgecolor="white", linewidth=0.5, ax=ax
+            )
+            plt.xlabel("Duration (s)", fontsize=9)
+
+        plt.title(col, fontsize=11, pad=8)
+        ax.set_xlabel("")
+        ax.set_ylabel("")
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+
+    plt.tight_layout(pad=2.0, h_pad=3.0, w_pad=2.0)
+
+    return fig

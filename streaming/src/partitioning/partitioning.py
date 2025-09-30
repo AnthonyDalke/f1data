@@ -7,7 +7,12 @@ import pandas as pd
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import count
 
-from functions import create_spark_session, get_partition_stats, time_process
+from functions import (
+    create_spark_session,
+    get_partition_stats,
+    plot_distributions,
+    time_process,
+)
 from ProcessMonitor import ProcessMonitor
 from spark_config import config_base
 
@@ -67,6 +72,13 @@ def main():
     load_end: float = time.time()
     time_process(load_start, load_end, "session data load")
 
+    fig = plot_distributions(combined_telemetry)
+    plt.show()
+
+    repartition_column: str = input(
+        "Enter the column name to use for repartitioning (e.g., SessionTime)"
+    )
+
     stop_command: str | None = None
 
     while stop_command != "stop":
@@ -88,18 +100,6 @@ def main():
             f"Testing Spark Session configuration setting {test_setting} with a value of {test_value}."
         )
 
-        if test_setting == "repartitioning":
-            # Generate histograms to assess for skew
-            combined_telemetry.hist(figsize=(12, 8))
-            plt.tight_layout()
-            plt.show()
-
-            combined_telemetry["Driver"].value_counts().plot(
-                kind="bar", figsize=(10, 4), title="Driver Distribution"
-            )
-            plt.ylabel("Count")
-            plt.show()
-
         spark_session = create_spark_session(test_setting, test_value)
         df_base: DataFrame = spark_session.createDataFrame(combined_telemetry)
 
@@ -110,7 +110,9 @@ def main():
 
         get_partition_stats(df_base, "before")
 
-        df_repartitioned: DataFrame = df_base.repartition(6, "SessionTime").persist()
+        df_repartitioned: DataFrame = df_base.repartition(
+            6, repartition_column
+        ).persist()
         get_partition_stats(df_repartitioned, "after")
 
         df_agg: DataFrame = df_repartitioned.groupBy("Driver").agg(
