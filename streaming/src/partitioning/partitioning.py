@@ -76,7 +76,7 @@ def main():
     plt.show()
 
     repartition_column: str = input(
-        "Enter the column name to use for repartitioning (e.g., SessionTime)"
+        "Enter the column name to use for repartitioning (e.g., SessionTime): "
     )
 
     stop_command: str | None = None
@@ -115,10 +115,11 @@ def main():
         ).persist()
         get_partition_stats(df_repartitioned, "after")
 
-        df_agg: DataFrame = df_repartitioned.groupBy("Driver").agg(
-            count("Speed").alias("SpeedCount")
-        )
-        df_agg.write.mode("overwrite").parquet(f"{test_setting}_{test_value}")
+        if test_setting != "repartitioning":
+            df_agg: DataFrame = df_repartitioned.groupBy("Driver").agg(
+                count("Speed").alias("SpeedCount")
+            )
+            df_agg.write.mode("overwrite").parquet(f"{test_setting}_{test_value}")
 
         process_monitor.stop()
 

@@ -37,4 +37,5 @@ config_keys: dict[str, str] = {
     "driver.memory": "spark.driver.memory",
     "shuffle.partitions": "spark.sql.shuffle.partitions",
     "serializer": "spark.serializer",
+    "repartitioning": "",
 }
